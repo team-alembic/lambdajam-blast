@@ -14,7 +14,10 @@ config :blast, BlastWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "VB3trJje1/klbu5vAtGoDsKEuEG6SVv34tfzul7txK6CfMZSPl3k2R5QcBWGe0U7",
   render_errors: [view: BlastWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Blast.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Blast.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [
+     signing_salt: "funtimes!"
+   ]
 
 # Configures Elixir's Logger
 config :logger, :console,

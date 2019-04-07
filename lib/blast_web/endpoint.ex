@@ -1,6 +1,8 @@
 defmodule BlastWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :blast
 
+  socket "/live", Phoenix.LiveView.Socket
+
   socket "/socket", BlastWeb.UserSocket,
     websocket: true,
     longpoll: false
