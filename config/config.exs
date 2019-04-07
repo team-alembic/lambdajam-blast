@@ -7,8 +7,7 @@
 # General application configuration
 use Mix.Config
 
-config :blast,
-  ecto_repos: [Blast.Repo]
+config :blast, ecto_repos: []
 
 # Configures the endpoint
 config :blast, BlastWeb.Endpoint,

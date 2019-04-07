@@ -8,8 +8,6 @@ defmodule Blast.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      # Start the Ecto repository
-      Blast.Repo,
       # Start the endpoint when the application starts
       BlastWeb.Endpoint
       # Starts a worker by calling: Blast.Worker.start_link(arg)

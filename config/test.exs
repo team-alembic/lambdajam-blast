@@ -6,13 +6,7 @@ config :blast, BlastWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :blast, ecto_repos: []
+
 # Print only warnings and errors during test
 config :logger, level: :warn
-
-# Configure your database
-config :blast, Blast.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "blast_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
