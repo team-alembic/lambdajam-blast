@@ -15,6 +15,14 @@ defmodule BlastWeb.LobbyLive do
   end
 
   def mount(session, socket) do
+    if connected?(socket) do
+      :timer.send_interval(10, self(), :tick)
+    end
+
     {:ok, assign(socket, player_count: PlayerService.count())}
+  end
+
+  def handle_info(:tick, socket) do
+    {:noreply, assign(socket, player_count: PlayerService.count())}
   end
 end
