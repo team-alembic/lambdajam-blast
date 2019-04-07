@@ -1,6 +1,8 @@
 defmodule BlastWeb.LobbyLive do
   use Phoenix.LiveView
 
+  alias Blast.PlayerService
+
   def render(assigns) do
     ~L"""
     <div>
@@ -10,6 +12,6 @@ defmodule BlastWeb.LobbyLive do
   end
 
   def mount(_session, socket) do
-    {:ok, assign(socket, player_count: 0)}
+    {:ok, assign(socket, player_count: PlayerService.count())}
   end
 end

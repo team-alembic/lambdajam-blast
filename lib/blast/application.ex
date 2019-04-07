@@ -9,7 +9,8 @@ defmodule Blast.Application do
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      BlastWeb.Endpoint
+      BlastWeb.Endpoint,
+      {Blast.PlayerService, [players: %{}]}
       # Starts a worker by calling: Blast.Worker.start_link(arg)
       # {Blast.Worker, arg},
     ]
