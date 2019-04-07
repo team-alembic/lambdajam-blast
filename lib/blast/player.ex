@@ -1,3 +1,10 @@
 defmodule Blast.Player do
-  defstruct [:name, :sprite]
+  @moduledoc """
+  A player has:
+
+  - name (unique)
+  - a session_id (unique)
+  - sprite (also unique)
+  """
+  defstruct [:session_id, :name, :sprite]
 end
