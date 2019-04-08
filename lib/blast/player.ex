@@ -6,5 +6,5 @@ defmodule Blast.Player do
   - a session_id (unique)
   - sprite (also unique)
   """
-  defstruct [:session_id, :name, :sprite]
+  defstruct [:name, :session_id]
 end

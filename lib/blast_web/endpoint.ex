@@ -44,5 +44,7 @@ defmodule BlastWeb.Endpoint do
     key: "_blast_key",
     signing_salt: "AR/ES/vm"
 
+  plug BlastWeb.SetSessionIDPlug
+
   plug BlastWeb.Router
 end

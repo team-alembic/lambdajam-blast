@@ -8,7 +8,7 @@ defmodule BlastWeb.LobbyLive do
     <div>
       <h2>Lobby</h2>
       <div class="container">
-        <%= assigns.player_count %> players connected
+        <%= assigns.player_count %> player(s) connected
       </div>
       <div class="container">
         Current session has player? <%= if assigns.current_player, do: assigns.current_player.name %>
@@ -18,9 +18,8 @@ defmodule BlastWeb.LobbyLive do
   end
 
   def mount(session, socket) do
-    IO.inspect(session: session)
     if connected?(socket) do
-      :timer.send_interval(10, self(), {:tick, session, socket})
+      :timer.send_interval(100, self(), {:tick, session, socket})
     end
 
     {:ok, refresh(session, socket)}
@@ -32,9 +31,8 @@ defmodule BlastWeb.LobbyLive do
 
   defp refresh(session, socket) do
     assign(socket,
-      session: session,
       player_count: PlayerService.count(),
-      current_player: PlayerService.get(session[:uuid]),
+      current_player: PlayerService.get(session[:session_id]),
     )
   end
 end
