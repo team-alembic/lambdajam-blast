@@ -1,4 +1,4 @@
-defmodule BlastWeb.LobbyLive do
+defmodule BlastWeb.GameLive do
   use Phoenix.LiveView
 
   def render(assigns) do
@@ -9,11 +9,12 @@ defmodule BlastWeb.LobbyLive do
     """
   end
 
-  def mount(session, socket) do
-    {:ok, refresh(session, socket)}
+  def mount(assigns, socket) do
+    {:ok, refresh(assigns, socket)}
   end
 
-  defp refresh(_session, socket) do
-    assign(socket, [])
+  defp refresh(assigns, socket) do
+    socket
+    |> assign(assigns, %{})
   end
 end

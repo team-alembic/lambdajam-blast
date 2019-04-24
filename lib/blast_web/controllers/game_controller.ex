@@ -25,9 +25,9 @@ defmodule BlastWeb.GameController do
     do_get(conn, Registry.lookup(GameServerRegistry, token), token, player_id)
   end
 
-  defp do_get(conn, [pid, _], token, player_id) do
+  defp do_get(conn, [{pid, _}], token, player_id) do
     :ok = GameServer.add_player(pid, player_id)
-    live_render(conn, BlastWeb.GameLive, token: token, player_id: player_id)
+    live_render(conn, BlastWeb.GameLive, session: %{token: token, player_id: player_id})
   end
   defp do_get(conn, _, _, _) do
     put_status(conn, :not_found)

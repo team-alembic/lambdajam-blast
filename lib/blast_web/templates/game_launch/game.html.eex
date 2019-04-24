@@ -5,8 +5,8 @@
   </script>
   <div class="dashboard">
     <div>
-      <a class="button copy-link" data-clipboard-text="<%= Routes.game_path(@conn, :get, @token) %>">Copy link 📋</a>
-      <a class="button" href="<%= Routes.game_path(@conn, :get, @token) %>">Join Game 🎮</a>
+      <a class="button copy-link" data-clipboard-text="<%= Routes.game_path(@conn, :join_game, @token) %>">Copy link 📋</a>
+      <a class="button" href="<%= Routes.game_path(@conn, :join_game, @token) %>">Join Game 🎮</a>
     </div>
     <p>
       Copy and share the link to play with friends 👫
