@@ -14,7 +14,7 @@ defmodule Blast.GameServer do
   end
 
   def handle_call({:add_player, player_id}, _from, game_state) do
-    {:reply, :ok, %GameState{game_state | players: MapSet.put(game_state.players, player_id)}}
+    {:reply, :ok, game_state |> GameState.add_player(player_id)}
   end
 
   def add_player(name, player_id) do
