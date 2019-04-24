@@ -10,7 +10,8 @@ defmodule Blast.Application do
     children = [
       # Start the endpoint when the application starts
       BlastWeb.Endpoint,
-      {Blast.PlayerService, [players: %{}]}
+      {Registry, [keys: :unique, name: GameServerRegistry]},
+      {Blast.GameLaunchServer, []}
       # Starts a worker by calling: Blast.Worker.start_link(arg)
       # {Blast.Worker, arg},
     ]

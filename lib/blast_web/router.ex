@@ -18,7 +18,9 @@ defmodule BlastWeb.Router do
   scope "/", BlastWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    # get "/", PageController, :index
+
+    match :get, "/game/:token", GameController, :get
   end
 
   # Other scopes may use custom stacks.

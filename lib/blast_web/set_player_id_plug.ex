@@ -1,4 +1,4 @@
-defmodule BlastWeb.SetSessionIDPlug do
+defmodule BlastWeb.SetPlayerIDPlug do
   alias Plug.Conn
 
   def init(opts) do
@@ -7,8 +7,8 @@ defmodule BlastWeb.SetSessionIDPlug do
 
   def call(conn, _opts) do
     conn1 = Conn.fetch_session(conn)
-    if !Conn.get_session(conn1, :session_id) do
-      Conn.put_session(conn1, :session_id, UUID.uuid4())
+    if !Conn.get_session(conn1, :player_id) do
+      Conn.put_session(conn1, :player_id, UUID.uuid4())
     else
       conn1
     end
