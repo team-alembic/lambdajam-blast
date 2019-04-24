@@ -1,4 +1,7 @@
 defmodule BlastWeb.SetPlayerIDPlug do
+  @moduledoc """
+  This module generates a unique `player_id` value and assigns it to the current session.
+  """
   alias Plug.Conn
 
   def init(opts) do

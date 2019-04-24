@@ -1,0 +1,5 @@
+<div class="page launch-page">
+  <%= form_for @conn, Routes.game_launch_path(@conn, :create), fn _ -> %>
+    <%= submit "Launch Game 🚀" %>
+  <% end %>
+</div>

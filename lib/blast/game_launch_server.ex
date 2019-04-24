@@ -24,7 +24,7 @@ defmodule Blast.GameLaunchServer do
 
   def handle_call({:new}, _from, counter) do
     {:ok, token} = launch_game_server(counter)
-    {:reply, token, counter + 1}
+    {:reply, {:ok, token}, counter + 1}
   end
 
   def new() do

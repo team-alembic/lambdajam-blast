@@ -18,7 +18,8 @@ defmodule BlastWeb.Router do
   scope "/", BlastWeb do
     pipe_through :browser
 
-    # get "/", PageController, :index
+    get "/", GameLaunchController, :index
+    post "/", GameLaunchController, :create
 
     match :get, "/game/:token", GameController, :get
   end

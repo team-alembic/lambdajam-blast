@@ -1,3 +1,49 @@
 /* This file is for your main application css. */
 
 @import "./phoenix.css";
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  display: flex;
+}
+
+.launch-page {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.join-page {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.join-page .dashboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.launch-page button,
+.join-page .dashboard {
+  transform: scale(3);
+}
+
+.join-page .copy-link {
+  background: green;
+  border-color: green;
+}
+
+.join-page p {
+  font-size: 0.6em;
+}
