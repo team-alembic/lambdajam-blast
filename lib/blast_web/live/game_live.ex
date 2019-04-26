@@ -37,10 +37,32 @@ defmodule BlastWeb.GameLive do
 
     ~L"""
     <polygon
-      points="25 0, 35 50, 15 50"
+      points="<%= player_polygon() %>"
       fill='white'
-      transform='rotate(<%= signed_angle_between(north, unit(orientation)) %> 25 25)'
+      transform='
+        translate(<%= position.x - player_centre_x() %>, <%= position.y - player_centre_y() %>)
+        rotate(<%= signed_angle_between(north, unit(orientation)) %> <%= player_polygon_centre() %>)
+      '
     />
     """
+  end
+
+  defp player_polygon() do
+    raw Player.vertices() |> Enum.map(fn (%{x: x, y: y}) -> "#{x} #{y}" end) |> Enum.join(", ")
+  end
+
+  defp player_polygon_centre() do
+    %{x: x, y: y} = Player.centre()
+    raw "#{x} #{y}"
+  end
+
+  defp player_centre_x() do
+    %{x: x} = Player.centre()
+    x
+  end
+
+  defp player_centre_y() do
+    %{y: y} = Player.centre()
+    y
   end
 end

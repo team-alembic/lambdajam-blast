@@ -53,7 +53,7 @@ defmodule Blast.Vector2D do
 
   Output is -180 to +180.
   """
-  def signed_angle_between(v1 = %__MODULE__{x: x1, y: y1}, v2 = %__MODULE__{x: x2, y: y2}) do
+  def signed_angle_between(v1 = %__MODULE__{}, v2 = %__MODULE__{}) do
     :math.atan2(cross(v1, v2), dot(v1, v2)) * @degrees_per_radian
   end
 end
