@@ -27,6 +27,14 @@ defmodule Blast.GameServer do
     {:reply, game_state, state}
   end
 
+  def handle_call({:rotate_player_clockwise, player_id}, _from, {token, game_state, event_buffer}) do
+    {:reply, :ok, {token, game_state, [{:rotate_player_clockwise, player_id} | event_buffer]}}
+  end
+
+  def handle_call({:rotate_player_anticlockwise, player_id}, _from, {token, game_state, event_buffer}) do
+    {:reply, :ok, {token, game_state, [{:rotate_player_anticlockwise, player_id} | event_buffer]}}
+  end
+
   def handle_call({:add_player, player_id}, _from, {token, game_state, event_buffer}) do
     {:reply, :ok, {token, game_state, [{:add_player, player_id} | event_buffer]}}
   end
@@ -41,6 +49,14 @@ defmodule Blast.GameServer do
 
   def add_player(name, player_id) do
     GenServer.call(name, {:add_player, player_id})
+  end
+
+  def rotate_player_clockwise(name, player_id) do
+    GenServer.call(name, {:rotate_player_clockwise, player_id})
+  end
+
+  def rotate_player_anticlockwise(name, player_id) do
+    GenServer.call(name, {:rotate_player_anticlockwise, player_id})
   end
 
   def game_state(name) do

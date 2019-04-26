@@ -55,6 +55,9 @@ defmodule Blast.GameState do
   def process_event(game_state, frame_millis, {:rotate_player_clockwise, player_id}) do
     game_state |> rotate_player_clockwise(frame_millis, player_id)
   end
+  def process_event(game_state, frame_millis, {:rotate_player_anticlockwise, player_id}) do
+    game_state |> rotate_player_anticlockwise(frame_millis, player_id)
+  end
   def process_event(game_state, _, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
     game_state
@@ -92,7 +95,16 @@ defmodule Blast.GameState do
   """
   def rotate_player_clockwise(game_state, frame_millis, player_id) do
     %__MODULE__{players: %{^player_id => player}} = game_state
-    updated_player = %Player{player | orientation: Vector2D.rotate(player.orientation, 1500 / 360)}
+    updated_player = %Player{player | orientation: Vector2D.rotate(player.orientation, (frame_millis / 1500.0) * 360)}
+    %__MODULE__{game_state | players: %{ game_state.players | player_id => updated_player }}
+  end
+
+  @doc """
+  Rotate a player anticlockwise with angular velocity of 1.5 seconds for full rotation.
+  """
+  def rotate_player_anticlockwise(game_state, frame_millis, player_id) do
+    %__MODULE__{players: %{^player_id => player}} = game_state
+    updated_player = %Player{player | orientation: Vector2D.rotate(player.orientation, -((frame_millis / 1500.0) * 360))}
     %__MODULE__{game_state | players: %{ game_state.players | player_id => updated_player }}
   end
 end

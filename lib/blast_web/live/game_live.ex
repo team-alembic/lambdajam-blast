@@ -5,12 +5,17 @@ defmodule BlastWeb.GameLive do
   import Phoenix.HTML
   alias Phoenix.LiveView.Socket
 
+  alias Blast.GameServer
   alias Blast.Player
   import Blast.Vector2D
 
   def render(assigns) do
     ~L"""
-    <svg class="arena" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+    <svg id="arena" class="arena" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"
+      phx-keydown="player_keydown"
+      phx-keyup="player_keyup"
+      phx-target="window"
+     >
       <rect x="0" y="0" width="1000" height="1000" />
       <%= for player <- Map.values(@game_state.players) do %>
         <%= draw_player(player) %>
@@ -31,6 +36,20 @@ defmodule BlastWeb.GameLive do
   def handle_info({:game_state_updated, game_state}, socket = %Socket{assigns: assigns}) do
     {:noreply, assign(socket, %{:game_state => game_state})}
   end
+
+  def handle_event("player_keydown", "ArrowRight", socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
+    [{pid, _}] = Registry.lookup(GameServerRegistry, token)
+    GameServer.rotate_player_clockwise(pid, player_id)
+    {:noreply, socket}
+  end
+
+  def handle_event("player_keydown", "ArrowLeft", socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
+    [{pid, _}] = Registry.lookup(GameServerRegistry, token)
+    GameServer.rotate_player_anticlockwise(pid, player_id)
+    {:noreply, socket}
+  end
+
+  def handle_event(_, _, socket), do: {:noreply, socket}
 
   defp draw_player(assigns = %Player{position: position, orientation: orientation}) do
     # A player is respresented by an equilateral triangle centred on `position` and rotated by `orientation`.
