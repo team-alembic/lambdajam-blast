@@ -50,6 +50,17 @@ defmodule Blast.GameState do
     length(Map.keys(players))
   end
 
+  @doc """
+  Processes one user-generated event and returns a new GameState.
+
+  i.e. updates positions of all of the players and projectiles.
+
+  NOTE: this function does not process any damage.
+  """
+  def process_event(game_state = %__MODULE__{}, _frame_millis, _event) do
+    game_state # TODO
+  end
+
   defp initial_positition(1), do: Vector2D.new(50, 50)
   defp initial_positition(2), do: Vector2D.new(950, 50)
   defp initial_positition(3), do: Vector2D.new(50, 950)
