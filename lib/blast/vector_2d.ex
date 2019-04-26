@@ -42,7 +42,7 @@ defmodule Blast.Vector2D do
   end
 
   @doc """
-  Computes the cross product of two Vector2D (answer is a scalar with 2D vectors)
+  Computes the cross product of two Vector2D
   """
   def cross(%__MODULE__{x: x1, y: y1}, %__MODULE__{x: x2, y: y2}) do
     x1 * y2 - x2 * y1
@@ -55,5 +55,18 @@ defmodule Blast.Vector2D do
   """
   def signed_angle_between(v1 = %__MODULE__{}, v2 = %__MODULE__{}) do
     :math.atan2(cross(v1, v2), dot(v1, v2)) * @degrees_per_radian
+  end
+
+  @doc """
+  Rotates a vector about the origin (0, 0).
+
+  +ve degrees are clockwise, -ve are anticlockwise
+  """
+  def rotate(v = %__MODULE__{x: x, y: y}, degrees) do
+    radians = degrees * (:math.pi / 180)
+    %__MODULE__{
+      x: x * :math.cos(radians) - y * :math.sin(radians),
+      y: x * :math.sin(radians) + y * :math.cos(radians)
+    }
   end
 end

@@ -57,8 +57,6 @@ defmodule Blast.GameStateTest do
     assert GameState.player(new_state, "2").orientation == p2_expected_orientation
 
     # Player 3 is bottom-left pointing towards the centre
-    # assert (new_state |> GameState.player("3")).position ==
-    #   Vector2D.new(1, -1) |> Vector2D.unit() |> Vector2D.add(50, new_state.arena_size - 50)
     p3_expected_orientation = Vector2D.new(1, -1) |> Vector2D.unit()
     p3_expected_position = Vector2D.new(50, 950)
     assert GameState.player(new_state, "3").position == p3_expected_position
@@ -70,4 +68,12 @@ defmodule Blast.GameStateTest do
     assert GameState.player(new_state, "4").position == p4_expected_position
     assert GameState.player(new_state, "4").orientation == p4_expected_orientation
   end
+
+  test "rotate_player_clockwise event", %{state: state} do
+    initial_state = state |> GameState.add_player("1")
+    next_state = initial_state |> GameState.process_event(16, {:rotate_player_clockwise, "1"})
+    assert next_state.players["1"].orientation != initial_state.players["1"].orientation
+  end
+
+  test "duplicate events are ignored"
 end

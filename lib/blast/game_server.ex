@@ -32,10 +32,8 @@ defmodule Blast.GameServer do
   end
 
   def handle_info(:process_events, {token, game_state, event_buffer}) do
-    next_game_state = event_buffer
-      |> Enum.reduce(game_state, fn (event, acc) ->
-        GameState.process_event(acc, @millis_per_server_frame, event)
-      end)
+    next_game_state = game_state
+    |> GameState.process_events(@millis_per_server_frame, event_buffer)
     broadcast(Blast.PubSub, "game/#{token}", {:game_state_updated, next_game_state})
     Process.send_after(self(), :process_events, @millis_per_server_frame)
     {:noreply, {token, next_game_state, []}}
