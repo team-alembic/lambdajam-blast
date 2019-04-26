@@ -4,6 +4,13 @@ defmodule Blast.Vector2D do
   """
   defstruct [:x, :y]
 
+  @degrees_per_radian 57.2958
+
+  def north, do: unit(new(0, -1))
+  def east, do: unit(new(1, 0))
+  def south, do: unit(new(1, 1))
+  def west, do: unit(new(-1, 0))
+
   def new(x, y) do
     %__MODULE__{x: x, y: y}
   end
@@ -25,5 +32,28 @@ defmodule Blast.Vector2D do
     else
       v
     end
+  end
+
+  @doc """
+  Computes the dot product of two Vector2D
+  """
+  def dot(%__MODULE__{x: x1, y: y1}, %__MODULE__{x: x2, y: y2}) do
+    x1 * x2 + y1 * y2
+  end
+
+  @doc """
+  Computes the cross product of two Vector2D (answer is a scalar with 2D vectors)
+  """
+  def cross(%__MODULE__{x: x1, y: y1}, %__MODULE__{x: x2, y: y2}) do
+    x1 * y2 - x2 * y1
+  end
+
+  @doc """
+  Computes the signed angle in degrees between two vectors in degrees (not radians).
+
+  Output is -180 to +180.
+  """
+  def signed_angle_between(v1 = %__MODULE__{x: x1, y: y1}, v2 = %__MODULE__{x: x2, y: y2}) do
+    :math.atan2(cross(v1, v2), dot(v1, v2)) * @degrees_per_radian
   end
 end

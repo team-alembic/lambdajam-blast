@@ -38,7 +38,7 @@ defmodule Blast.GameServer do
       end)
     broadcast(Blast.PubSub, "game/#{token}", {:game_state_updated, next_game_state})
     Process.send_after(self(), :process_events, @millis_per_server_frame)
-    {:no_reply, {token, next_game_state, []}}
+    {:noreply, {token, next_game_state, []}}
   end
 
   def add_player(name, player_id) do
