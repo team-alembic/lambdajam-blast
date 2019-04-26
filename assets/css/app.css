@@ -47,3 +47,14 @@ body {
 .join-page p {
   font-size: 0.6em;
 }
+
+.arena {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100vh;
+  width: auto;
+}
