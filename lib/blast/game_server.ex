@@ -8,9 +8,11 @@ defmodule Blast.GameServer do
   """
   use GenServer
 
+  import Phoenix.PubSub
+
   alias Blast.GameState
 
-  @millis_per_server_frame 8
+  @millis_per_server_frame 16
 
   def start_link([name: name = {_, _, {_, token}}]) do
     GenServer.start_link(__MODULE__, [token], name: name)
@@ -21,21 +23,30 @@ defmodule Blast.GameServer do
     {:ok, {token, GameState.new(), []}}
   end
 
+  def handle_call(:game_state, _from, state = {_, game_state, _}) do
+    {:reply, game_state, state}
+  end
+
   def handle_call({:add_player, player_id}, _from, {token, game_state, event_buffer}) do
     {:reply, :ok, {token, game_state, [{:add_player, player_id} | event_buffer]}}
   end
 
-  def handle_call(:process_events, _from, {token, game_state, event_buffer}) do
+  def handle_info(:process_events, {token, game_state, event_buffer}) do
     next_game_state = event_buffer
-      |> Enum.reduce(game_state, fn (acc, event) ->
+      |> Enum.reduce(game_state, fn (event, acc) ->
         GameState.process_event(acc, @millis_per_server_frame, event)
       end)
+    broadcast(Blast.PubSub, "game/#{token}", {:game_state_updated, next_game_state})
     Process.send_after(self(), :process_events, @millis_per_server_frame)
-    {:reply, :ok, {token, next_game_state, []}}
+    {:no_reply, {token, next_game_state, []}}
   end
 
   def add_player(name, player_id) do
     GenServer.call(name, {:add_player, player_id})
+  end
+
+  def game_state(name) do
+    GenServer.call(name, :game_state)
   end
 end
 

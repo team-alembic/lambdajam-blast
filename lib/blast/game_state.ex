@@ -57,8 +57,13 @@ defmodule Blast.GameState do
 
   NOTE: this function does not process any damage.
   """
-  def process_event(game_state = %__MODULE__{}, _frame_millis, _event) do
-    game_state # TODO
+  def process_event(game_state, frame_millis, event)
+  def process_event(game_state, frame_millis, {:add_player, player_id}) do
+    game_state |> add_player(player_id)
+  end
+  def process_event(game_state, _, event) do
+    IO.inspect("Unknown event: #{inspect(event)}")
+    game_state
   end
 
   defp initial_positition(1), do: Vector2D.new(50, 50)
