@@ -12,7 +12,7 @@ defmodule Blast.Player do
 
   import Blast.Vector2D
 
-  def vertices, do: [new(25, 0), new(35, 50), new(15, 50)]
+  def vertices, do: [new(25, 0), new(40, 50), new(25, 40), new(10, 50)]
 
   def centre do
     {totalX, totalY} =
