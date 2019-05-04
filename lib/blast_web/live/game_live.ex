@@ -37,15 +37,9 @@ defmodule BlastWeb.GameLive do
     {:noreply, assign(socket, %{:game_state => game_state})}
   end
 
-  def handle_event("player_keydown", "ArrowRight", socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
+  def handle_event("player_" <> event_type, event_data, socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
     [{pid, _}] = Registry.lookup(GameServerRegistry, token)
-    GameServer.player_turn_clockwise(pid, player_id)
-    {:noreply, socket}
-  end
-
-  def handle_event("player_keydown", "ArrowLeft", socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
-    [{pid, _}] = Registry.lookup(GameServerRegistry, token)
-    GameServer.player_turn_anticlockwise(pid, player_id)
+    handle_player_event(pid, player_id, event_type, event_data)
     {:noreply, socket}
   end
 
@@ -84,4 +78,11 @@ defmodule BlastWeb.GameLive do
     %{y: y} = Player.centre()
     y
   end
+
+  defp handle_player_event(pid, player_id, event_type, event_data)
+  defp handle_player_event(pid, player_id, "keydown", "ArrowLeft"), do: GameServer.set_player_turning(pid, player_id, :anticlockwise)
+  defp handle_player_event(pid, player_id, "keyup", "ArrowLeft"), do: GameServer.set_player_turning(pid, player_id, :none)
+  defp handle_player_event(pid, player_id, "keydown", "ArrowRight"), do: GameServer.set_player_turning(pid, player_id, :clockwise)
+  defp handle_player_event(pid, player_id, "keyup", "ArrowRight"), do: GameServer.set_player_turning(pid, player_id, :none)
+  defp handle_player_event(_, _, _, _), do: :ok
 end

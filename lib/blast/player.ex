@@ -8,7 +8,7 @@ defmodule Blast.Player do
 
   `position` is a unit Vector2D
   """
-  defstruct [:id, :position, :orientation]
+  defstruct [:id, :position, :orientation, :turning, :thrusting]
 
   import Blast.Vector2D
 
@@ -21,5 +21,13 @@ defmodule Blast.Player do
       end)
 
     new(totalX / length(vertices()), totalY / length(vertices()))
+  end
+
+  def set_turning(player = %__MODULE__{}, direction) when direction in [:clockwise, :anticlockwise, :paused] do
+    %__MODULE__{player | turning: direction}
+  end
+
+  def set_thrusting(player = %__MODULE__{}, enabled) when is_boolean(enabled) do
+    %__MODULE__{player | thrusting: enabled}
   end
 end
