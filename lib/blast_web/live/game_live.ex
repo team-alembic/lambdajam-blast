@@ -39,13 +39,13 @@ defmodule BlastWeb.GameLive do
 
   def handle_event("player_keydown", "ArrowRight", socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
     [{pid, _}] = Registry.lookup(GameServerRegistry, token)
-    GameServer.rotate_player_clockwise(pid, player_id)
+    GameServer.player_turn_clockwise(pid, player_id)
     {:noreply, socket}
   end
 
   def handle_event("player_keydown", "ArrowLeft", socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
     [{pid, _}] = Registry.lookup(GameServerRegistry, token)
-    GameServer.rotate_player_anticlockwise(pid, player_id)
+    GameServer.player_turn_anticlockwise(pid, player_id)
     {:noreply, socket}
   end
 

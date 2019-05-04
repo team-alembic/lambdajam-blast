@@ -69,9 +69,9 @@ defmodule Blast.GameStateTest do
     assert GameState.player(new_state, "4").orientation == p4_expected_orientation
   end
 
-  test "rotate_player_clockwise event", %{state: state} do
+  test "player_turn_clockwise event", %{state: state} do
     initial_state = state |> GameState.add_player("1")
-    next_state = initial_state |> GameState.process_event(16, {:rotate_player_clockwise, "1"})
+    next_state = initial_state |> GameState.process_event(16, {:player_turn_clockwise, "1"})
     assert next_state.players["1"].orientation != initial_state.players["1"].orientation
   end
 
