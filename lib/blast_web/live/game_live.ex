@@ -7,6 +7,7 @@ defmodule BlastWeb.GameLive do
 
   alias Blast.GameServer
   alias Blast.Player
+  alias Blast.Polygon
   import Blast.Vector2D
 
   def render(assigns) do
@@ -45,12 +46,10 @@ defmodule BlastWeb.GameLive do
 
   def handle_event(_, _, socket), do: {:noreply, socket}
 
-  defp draw_player(assigns = %Player{position: position, orientation: orientation, vertices: vertices}) do
-    # A player is respresented by an equilateral triangle centred on `position` and rotated by `orientation`.
-
+  defp draw_player(assigns = %Player{position: position, orientation: orientation, polygon: polygon}) do
     ~L"""
     <polygon
-      points="<%= player_polygon(vertices) %>"
+      points="<%= player_polygon(polygon) %>"
       fill='white'
       transform='
         translate(<%= position.x - player_centre_x(assigns) %>, <%= position.y - player_centre_y(assigns) %>)
@@ -60,22 +59,22 @@ defmodule BlastWeb.GameLive do
     """
   end
 
-  defp player_polygon(vertices) do
+  defp player_polygon(%Polygon{vertices: vertices}) do
     raw vertices |> Enum.map(fn (%{x: x, y: y}) -> "#{x} #{y}" end) |> Enum.join(", ")
   end
 
-  defp player_polygon_centre(player) do
-    %{x: x, y: y} = Player.centre(player)
+  defp player_polygon_centre(%Player{polygon: polygon}) do
+    %{x: x, y: y} = Polygon.centre(polygon)
     raw "#{x} #{y}"
   end
 
-  defp player_centre_x(player) do
-    %{x: x} = Player.centre(player)
+  defp player_centre_x(%Player{polygon: polygon}) do
+    %{x: x} = Polygon.centre(polygon)
     x
   end
 
-  defp player_centre_y(player) do
-    %{y: y} = Player.centre(player)
+  defp player_centre_y(%Player{polygon: polygon}) do
+    %{y: y} = Polygon.centre(polygon)
     y
   end
 

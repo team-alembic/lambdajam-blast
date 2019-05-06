@@ -26,12 +26,13 @@ defmodule Blast.Player do
     :mass,
     # Engine power in newtons
     :engine_power,
-    # The spaceship's polygon
-    :vertices
+    # The polygon
+    :polygon
   ]
 
   import Blast.Vector2D
   import Blast.Physics
+  alias Blast.Polygon
 
   @player_defaults %{
     :velocity => new(0, 0),
@@ -39,21 +40,11 @@ defmodule Blast.Player do
     :thrusters => :off,
     :engine_power => 4,
     :mass => 500,
-    :vertices => [new(25, 0), new(40, 50), new(25, 40), new(10, 50)]
+    :polygon => Polygon.new([{25, 0}, {40, 50}, {25, 40}, {10, 50}])
   }
 
   def new(values = %{}) do
     struct(__MODULE__, Map.merge(values, @player_defaults))
-  end
-
-  # TODO move this to a generic Polygon module (and define vertices using the Polygon module)
-  def centre(%__MODULE__{vertices: vertices}) do
-    {totalX, totalY} =
-      vertices |> Enum.reduce({0, 0}, fn (%{x: x, y: y}, {sumX, sumY}) ->
-        {sumX + x, sumY + y}
-      end)
-
-    new(totalX / length(vertices), totalY / length(vertices))
   end
 
   def set_turning(player = %__MODULE__{}, option) when option in [:right, :left, :not_turning] do
