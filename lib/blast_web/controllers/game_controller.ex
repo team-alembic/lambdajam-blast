@@ -34,7 +34,7 @@ defmodule BlastWeb.GameController do
       game_state: game_state
     })
   end
-  defp do_get(conn, _, _, _) do
-    put_status(conn, :not_found)
+  defp do_get(conn, _, token, _) do
+    send_resp(conn, :not_found, "Game #{token} not found")
   end
 end
