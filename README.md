@@ -24,8 +24,8 @@ Blast uses HTML Session Storage so you can have a player per browser tab that yo
 
 ## Game controls
 
-Rotate anti-clockwise: left cursor key or `h`.
-Rotate clockwise: right cursor key or `l`.
+Rotate anti-right: left cursor key or `h`.
+Rotate right: right cursor key or `l`.
 
 Fire booster: up cursor key or `j`
 Fire weapon: spacebar or `k`

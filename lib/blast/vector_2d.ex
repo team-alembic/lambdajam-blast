@@ -34,6 +34,16 @@ defmodule Blast.Vector2D do
     end
   end
 
+  # TODO add test
+  def add(%__MODULE__{x: x1, y: y1}, %__MODULE__{x: x2, y: y2}) do
+    %__MODULE__{x: x1 + x2, y: y1 + y2}
+  end
+
+  def multiply_mag(v = %__MODULE__{x: x, y: y}, multiplier) do
+    old_mag = mag(v)
+    %__MODULE__{x: x * multiplier * old_mag, y: y * multiplier * old_mag}
+  end
+
   @doc """
   Computes the dot product of two Vector2D
   """
