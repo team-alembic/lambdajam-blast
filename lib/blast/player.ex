@@ -37,8 +37,8 @@ defmodule Blast.Player do
     :velocity => new(0, 0),
     :turning => :not_turning,
     :thrusters => :off,
-    :engine_power => 2,
-    :mass => 1000,
+    :engine_power => 4,
+    :mass => 500,
     :vertices => [new(25, 0), new(40, 50), new(25, 40), new(10, 50)]
   }
 
@@ -81,20 +81,29 @@ defmodule Blast.Player do
   @doc """
   Apply thrust in the direction of the player's orientation.
 
-  Uses Newtonian mechanics to calculate updated position and velocity for an acceleration over `frame_millis`.
+  Uses Newtonian mechanics to calculate an updated velocity for an acceleration over `frame_millis`.
   """
   def apply_thrust(player = %__MODULE__{
-    mass: mass,
-    position: position,
     velocity: velocity,
+    mass: mass,
     orientation: orientation,
     engine_power: engine_power
   },
     frame_millis
   ) do
     force_vector = multiply_mag(orientation, engine_power)
-    {new_position, new_velocity} = apply_force(position, velocity, mass, force_vector, frame_millis)
-    IO.inspect({new_position, new_velocity})
-    %__MODULE__{player | position: new_position, velocity: new_velocity}
+    new_velocity = apply_force(velocity, mass, force_vector, frame_millis)
+    %__MODULE__{player | velocity: new_velocity}
   end
+
+  def apply_velocity(player = %__MODULE__{
+    position: position,
+    velocity: velocity
+  }) do
+    %__MODULE__{player | position: add(position, velocity)}
+  end
+
+  def apply_turn(player = %__MODULE__{turning: :left}, frame_millis), do: turn_left(player, frame_millis)
+  def apply_turn(player = %__MODULE__{turning: :right}, frame_millis), do: turn_right(player, frame_millis)
+  def apply_turn(player = %__MODULE__{turning: :not_turning, }, _), do: player
 end
