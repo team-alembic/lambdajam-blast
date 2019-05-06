@@ -94,7 +94,7 @@ defmodule Blast.GameState do
   end
 
   def update_players(game_state, frame_millis) do
-    %__MODULE__{players: players} = game_state
+    %__MODULE__{players: players, arena_size: arena_size} = game_state
     %__MODULE__{game_state | players: players |> Enum.reduce(%{}, fn ({player_id, player}, acc) ->
       acc
       |> Map.put(player_id,
@@ -102,6 +102,7 @@ defmodule Blast.GameState do
           |> Player.apply_turn(frame_millis)
           |> Player.apply_thrust(frame_millis)
           |> Player.apply_velocity()
+          |> Player.apply_edge_collisions(arena_size)
       )
     end)}
   end

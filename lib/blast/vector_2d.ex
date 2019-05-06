@@ -67,6 +67,14 @@ defmodule Blast.Vector2D do
     :math.atan2(cross(v1, v2), dot(v1, v2)) * @degrees_per_radian
   end
 
+  def invert_x(%__MODULE__{x: x, y: y}) do
+    %__MODULE__{x: -x, y: y}
+  end
+
+  def invert_y(%__MODULE__{x: x, y: y}) do
+    %__MODULE__{x: x, y: -y}
+  end
+
   @doc """
   Rotates a vector about the origin (0, 0).
 
