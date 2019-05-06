@@ -17,10 +17,11 @@ defmodule BlastWeb.GameLive do
       phx-keyup="player_keyup"
       phx-target="window"
      >
-      <rect x="0" y="0" width="1000" height="1000" fill="#000" stroke="#F00" stroke-width="10"/>
+      <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
       <%= for player <- Map.values(@game_state.players) do %>
         <%= draw_player(player) %>
       <% end %>
+      <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
     </svg>
     """
   end
