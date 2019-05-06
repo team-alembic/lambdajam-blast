@@ -52,11 +52,11 @@ defmodule Blast.GameState do
   def process_event(game_state, _, {:add_player, player_id}) do
     game_state |> add_player(player_id)
   end
-  def process_event(game_state, frame_millis, {:player_turn_clockwise, player_id}) do
-    game_state |> player_turn_clockwise(frame_millis, player_id)
+  def process_event(game_state, frame_millis, {:update_player, player_id, %{:turning => :left}}) do
+    game_state |> player_turn_left(frame_millis, player_id)
   end
-  def process_event(game_state, frame_millis, {:player_turn_anticlockwise, player_id}) do
-    game_state |> player_turn_anticlockwise(frame_millis, player_id)
+  def process_event(game_state, frame_millis, {:update_player, player_id, %{:turning => :right}}) do
+    game_state |> player_turn_right(frame_millis, player_id)
   end
   def process_event(game_state, _, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
@@ -91,18 +91,18 @@ defmodule Blast.GameState do
   end
 
   @doc """
-  Rotate a player clockwise with angular velocity of 1.5 seconds for full rotation.
+  Rotate a player right with angular velocity of 1.5 seconds for full rotation.
   """
-  def player_turn_clockwise(game_state, frame_millis, player_id) do
+  def player_turn_right(game_state, frame_millis, player_id) do
     %__MODULE__{players: %{^player_id => player}} = game_state
     updated_player = %Player{player | orientation: Vector2D.rotate(player.orientation, (frame_millis / 1500.0) * 360)}
     %__MODULE__{game_state | players: %{ game_state.players | player_id => updated_player }}
   end
 
   @doc """
-  Rotate a player anticlockwise with angular velocity of 1.5 seconds for full rotation.
+  Rotate a player left with angular velocity of 1.5 seconds for full rotation.
   """
-  def player_turn_anticlockwise(game_state, frame_millis, player_id) do
+  def player_turn_left(game_state, frame_millis, player_id) do
     %__MODULE__{players: %{^player_id => player}} = game_state
     updated_player = %Player{player | orientation: Vector2D.rotate(player.orientation, -((frame_millis / 1500.0) * 360))}
     %__MODULE__{game_state | players: %{ game_state.players | player_id => updated_player }}

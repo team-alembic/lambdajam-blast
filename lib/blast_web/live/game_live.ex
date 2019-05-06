@@ -33,7 +33,7 @@ defmodule BlastWeb.GameLive do
     {:ok, assign(socket, assigns)}
   end
 
-  def handle_info({:game_state_updated, game_state}, socket = %Socket{assigns: assigns}) do
+  def handle_info({:game_state_updated, game_state}, socket = %Socket{}) do
     {:noreply, assign(socket, %{:game_state => game_state})}
   end
 
@@ -54,7 +54,7 @@ defmodule BlastWeb.GameLive do
       fill='white'
       transform='
         translate(<%= position.x - player_centre_x() %>, <%= position.y - player_centre_y() %>)
-        rotate(<%= signed_angle_between(north, unit(orientation)) %> <%= player_polygon_centre() %>)
+        rotate(<%= signed_angle_between(north(), unit(orientation)) %> <%= player_polygon_centre() %>)
       '
     />
     """
@@ -80,9 +80,11 @@ defmodule BlastWeb.GameLive do
   end
 
   defp handle_player_event(pid, player_id, event_type, event_data)
-  defp handle_player_event(pid, player_id, "keydown", "ArrowLeft"), do: GameServer.set_player_turning(pid, player_id, :anticlockwise)
-  defp handle_player_event(pid, player_id, "keyup", "ArrowLeft"), do: GameServer.set_player_turning(pid, player_id, :none)
-  defp handle_player_event(pid, player_id, "keydown", "ArrowRight"), do: GameServer.set_player_turning(pid, player_id, :clockwise)
-  defp handle_player_event(pid, player_id, "keyup", "ArrowRight"), do: GameServer.set_player_turning(pid, player_id, :none)
+  defp handle_player_event(pid, player_id, "keydown", "ArrowLeft"), do: GameServer.update_player(pid, player_id, %{:turning => :left})
+  defp handle_player_event(pid, player_id, "keyup", "ArrowLeft"), do: GameServer.update_player(pid, player_id, %{:turning => :not_turning})
+  defp handle_player_event(pid, player_id, "keydown", "ArrowRight"), do: GameServer.update_player(pid, player_id, %{:turning => :right})
+  defp handle_player_event(pid, player_id, "keyup", "ArrowRight"), do: GameServer.update_player(pid, player_id, %{:turning => :not_turning})
+  defp handle_player_event(pid, player_id, "keydown", "ArrowUp"), do: GameServer.update_player(pid, player_id, %{:thrusters => :on})
+  defp handle_player_event(pid, player_id, "keyup", "ArrowUp"), do: GameServer.update_player(pid, player_id, %{:thrusters => :off})
   defp handle_player_event(_, _, _, _), do: :ok
 end

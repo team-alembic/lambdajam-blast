@@ -8,12 +8,29 @@ defmodule Blast.Player do
 
   `position` is a unit Vector2D
   """
-  defstruct [:id, :position, :orientation, :turning, :thrusting]
+  defstruct [
+    # Player ID
+    :id,
+    # Position of the player
+    :position,
+    # Orientation of the player (offset from north).
+    # This is the direction in which thrust will be applied.
+    :orientation,
+    # Direction of motion of the player (offset from north)
+    :motion,
+    # Whether the platyer is turning (:left, :right, :not_turning)
+    :turning,
+    # Whether the thruster is on or off (:on, :off)
+    :thrusters
+  ]
 
   import Blast.Vector2D
 
-  def vertices, do: [new(25, 0), new(40, 50), new(25, 40), new(10, 50)]
+  @vertices [new(25, 0), new(40, 50), new(25, 40), new(10, 50)]
 
+  def vertices, do: @vertices
+
+  # TODO move this to a generic Polygon module (and define vertices using the Polygon module)
   def centre do
     {totalX, totalY} =
       vertices() |> Enum.reduce({0, 0}, fn (%{x: x, y: y}, {sumX, sumY}) ->
@@ -23,11 +40,11 @@ defmodule Blast.Player do
     new(totalX / length(vertices()), totalY / length(vertices()))
   end
 
-  def set_turning(player = %__MODULE__{}, direction) when direction in [:clockwise, :anticlockwise, :paused] do
-    %__MODULE__{player | turning: direction}
+  def set_turning(player = %__MODULE__{}, option) when option in [:right, :left, :not_turning] do
+    %__MODULE__{player | turning: option}
   end
 
-  def set_thrusting(player = %__MODULE__{}, enabled) when is_boolean(enabled) do
-    %__MODULE__{player | thrusting: enabled}
+  def set_thrusters(player = %__MODULE__{}, on_or_off) when on_or_off in [:on, :off] do
+    %__MODULE__{player | thrusters: on_or_off}
   end
 end

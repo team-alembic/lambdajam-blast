@@ -4,8 +4,6 @@ defmodule BlastWeb.GameLaunchController do
   """
   use BlastWeb, :controller
 
-  alias Plug.Conn
-
   alias Blast.GameLaunchServer
 
   def index(conn, _params) do

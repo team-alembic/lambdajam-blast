@@ -27,12 +27,8 @@ defmodule Blast.GameServer do
     {:reply, game_state, state}
   end
 
-  def handle_call({:player_turn_clockwise, player_id}, _from, {token, game_state, event_buffer}) do
-    {:reply, :ok, {token, game_state, [{:player_turn_clockwise, player_id} | event_buffer]}}
-  end
-
-  def handle_call({:player_turn_anticlockwise, player_id}, _from, {token, game_state, event_buffer}) do
-    {:reply, :ok, {token, game_state, [{:player_turn_anticlockwise, player_id} | event_buffer]}}
+  def handle_call({:update_player, player_id, values}, _from, {token, game_state, event_buffer}) do
+    {:reply, :ok, {token, game_state, [{:update_player, player_id, values} | event_buffer]}}
   end
 
   def handle_call({:add_player, player_id}, _from, {token, game_state, event_buffer}) do
@@ -51,16 +47,12 @@ defmodule Blast.GameServer do
     GenServer.call(name, {:add_player, player_id})
   end
 
-  def player_turn_clockwise(name, player_id) do
-    GenServer.call(name, {:player_turn_clockwise, player_id})
-  end
-
-  def player_turn_anticlockwise(name, player_id) do
-    GenServer.call(name, {:player_turn_anticlockwise, player_id})
-  end
-
   def game_state(name) do
     GenServer.call(name, :game_state)
+  end
+
+  def update_player(name, player_id, values = %{}) do
+    GenServer.call(name, {:update_player, player_id, values})
   end
 end
 

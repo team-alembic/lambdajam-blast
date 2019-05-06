@@ -60,9 +60,9 @@ defmodule Blast.Vector2D do
   @doc """
   Rotates a vector about the origin (0, 0).
 
-  +ve degrees are clockwise, -ve are anticlockwise
+  +ve degrees are right, -ve are left
   """
-  def rotate(v = %__MODULE__{x: x, y: y}, degrees) do
+  def rotate(%__MODULE__{x: x, y: y}, degrees) do
     radians = degrees * (:math.pi / 180)
     %__MODULE__{
       x: x * :math.cos(radians) - y * :math.sin(radians),
