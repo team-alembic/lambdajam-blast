@@ -47,7 +47,6 @@ defmodule Blast.Vector2DTest do
     assert_in_delta result_1.y, 0, @delta
 
     result_2 = rotate(unit(new(0, 1)), 90)
-    IO.inspect(result_2)
 
     assert_in_delta result_2.x, -1, @delta
     assert_in_delta result_2.y, 0, @delta

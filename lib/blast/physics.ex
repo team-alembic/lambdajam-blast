@@ -17,7 +17,9 @@ defmodule Blast.Physics do
     force_newtons = %Vector2D{},
     time_delta_millis
   ) do
-    velocity_contribution = multiply_mag(force_newtons, (time_delta_millis / 1000))
+    acceleration = mag(force_newtons) / mass_kg
+    velocity_contribution =
+      multiply_mag(force_newtons, (time_delta_millis / 1000) * acceleration)
     add(velocity, velocity_contribution)
   end
 end

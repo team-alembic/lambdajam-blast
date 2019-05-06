@@ -39,7 +39,7 @@ defmodule Blast.Vector2D do
     %__MODULE__{x: x1 + x2, y: y1 + y2}
   end
 
-  def multiply_mag(v = %__MODULE__{x: x, y: y}, multiplier) do
+  def multiply_mag(%__MODULE__{x: x, y: y}, multiplier) do
     %__MODULE__{x: x * multiplier, y: y * multiplier}
   end
 

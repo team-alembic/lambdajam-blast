@@ -42,7 +42,7 @@ defmodule Blast.Player do
     :velocity => new(0, 0),
     :turning => :not_turning,
     :thrusters => :off,
-    :engine_power => 10,
+    :engine_power => 80,
     :mass => 500,
     :polygon => Polygon.new([{25, 0}, {40, 50}, {25, 40}, {10, 50}])
   }
@@ -120,25 +120,25 @@ defmodule Blast.Player do
   # Fun exercise: option to allow a wrapping world?
   """
   def apply_edge_collisions(player, arena_size)
-  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{x: x}, velocity: velocity, orientation: orientation}, arena_size) when x > arena_size do
+  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{x: x}, velocity: velocity}, arena_size) when x > arena_size do
     apply_edge_collisions(%__MODULE__{player |
       velocity: velocity |> Vector2D.invert_x() |> Vector2D.multiply_mag(@collision_velocity_multiplier),
       position: %Vector2D{position | x: arena_size},
     }, arena_size)
   end
-  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{x: x}, velocity: velocity, orientation: orientation}, arena_size) when x < 0 do
+  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{x: x}, velocity: velocity}, arena_size) when x < 0 do
     apply_edge_collisions(%__MODULE__{player |
       velocity: velocity |> Vector2D.invert_x() |> Vector2D.multiply_mag(@collision_velocity_multiplier),
       position: %Vector2D{position | x: 0},
     }, arena_size)
   end
-  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{y: y}, velocity: velocity, orientation: orientation}, arena_size) when y > arena_size do
+  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{y: y}, velocity: velocity}, arena_size) when y > arena_size do
     apply_edge_collisions(%__MODULE__{player |
       velocity: velocity |> Vector2D.invert_y() |> Vector2D.multiply_mag(@collision_velocity_multiplier),
       position: %Vector2D{position | y: arena_size},
     }, arena_size)
   end
-  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{y: y}, velocity: velocity, orientation: orientation}, arena_size) when y < 0 do
+  def apply_edge_collisions(player = %__MODULE__{position: position = %Vector2D{y: y}, velocity: velocity}, arena_size) when y < 0 do
     apply_edge_collisions(%__MODULE__{player |
       velocity: velocity |> Vector2D.invert_y() |> Vector2D.multiply_mag(@collision_velocity_multiplier),
       position: %Vector2D{position | y: 0},
