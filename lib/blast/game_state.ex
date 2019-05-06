@@ -55,12 +55,12 @@ defmodule Blast.GameState do
   end
   def process_event(game_state, frame_millis, {:update_player, player_id, %{:turning => turning}}) do
     %__MODULE__{players: %{^player_id => player}} = game_state
-    %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | turning: turning} }}
+    %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | turning: turning}}}
   end
-  def process_event(game_state, frame_millis, {:update_player, player_id, %{:thrusters => :on}}) do
-    game_state |> player_thrust(frame_millis, player_id)
+  def process_event(game_state, frame_millis, {:update_player, player_id, %{:thrusters => thrusting}}) do
+    %__MODULE__{players: %{^player_id => player}} = game_state
+    %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | thrusters: thrusting} }}
   end
-  def process_event(game_state, _, {:update_player, _, %{:thrusters => :off}}), do: game_state
   def process_event(game_state, _, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
     game_state
@@ -93,17 +93,15 @@ defmodule Blast.GameState do
     end
   end
 
-  def player_thrust(game_state, frame_millis, player_id) do
-    %__MODULE__{players: %{^player_id => player}} = game_state
-    %__MODULE__{game_state | players: %{ game_state.players | player_id => Player.apply_thrust(player, frame_millis) }}
-  end
-
   def update_players(game_state, frame_millis) do
     %__MODULE__{players: players} = game_state
     %__MODULE__{game_state | players: players |> Enum.reduce(%{}, fn ({player_id, player}, acc) ->
       acc
       |> Map.put(player_id,
-          player |> Player.apply_velocity() |> Player.apply_turn(frame_millis)
+          player
+          |> Player.apply_turn(frame_millis)
+          |> Player.apply_thrust(frame_millis)
+          |> Player.apply_velocity()
       )
     end)}
   end

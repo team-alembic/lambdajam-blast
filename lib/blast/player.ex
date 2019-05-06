@@ -87,7 +87,8 @@ defmodule Blast.Player do
     velocity: velocity,
     mass: mass,
     orientation: orientation,
-    engine_power: engine_power
+    engine_power: engine_power,
+    thrusters: :on
   },
     frame_millis
   ) do
@@ -95,6 +96,7 @@ defmodule Blast.Player do
     new_velocity = apply_force(velocity, mass, force_vector, frame_millis)
     %__MODULE__{player | velocity: new_velocity}
   end
+  def apply_thrust(player = %__MODULE__{}, _), do: player
 
   def apply_velocity(player = %__MODULE__{
     position: position,
