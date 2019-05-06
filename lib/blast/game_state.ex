@@ -37,31 +37,30 @@ defmodule Blast.GameState do
     event_buffer
     |> Enum.uniq()
     |> Enum.reduce(game_state, fn (event, acc) ->
-      process_event(acc, frame_millis, event)
+      process_event(acc, event)
     end)
     |> update_players(frame_millis)
   end
 
-  @doc """
-  Processes one user-generated event and returns a new GameState.
-
-  i.e. updates positions of all of the players and projectiles.
-
-  NOTE: this function does not process any damage.
-  """
-  def process_event(game_state, frame_millis, event)
-  def process_event(game_state, _, {:add_player, player_id}) do
+  # Processes one user-generated event and returns a new GameState.
+  # i.e. updates positions of all of the players and projectiles.
+  defp process_event(game_state, event)
+  defp process_event(game_state, {:add_player, player_id}) do
     game_state |> add_player(player_id)
   end
-  def process_event(game_state, frame_millis, {:update_player, player_id, %{:turning => turning}}) do
+  defp process_event(game_state, {:update_player, player_id, %{:turning => turning}}) do
     %__MODULE__{players: %{^player_id => player}} = game_state
     %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | turning: turning}}}
   end
-  def process_event(game_state, frame_millis, {:update_player, player_id, %{:thrusters => thrusting}}) do
+  defp process_event(game_state, {:update_player, player_id, %{:thrusters => thrusting}}) do
     %__MODULE__{players: %{^player_id => player}} = game_state
     %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | thrusters: thrusting} }}
   end
-  def process_event(game_state, _, event) do
+  defp process_event(game_state, {:update_player, player_id, %{:primary_weapon => firing}}) do
+    %__MODULE__{players: %{^player_id => player}} = game_state
+    %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | primary_weapon: firing} }}
+  end
+  defp process_event(game_state, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
     game_state
   end
@@ -103,6 +102,8 @@ defmodule Blast.GameState do
           |> Player.apply_thrust(frame_millis)
           |> Player.apply_velocity()
           |> Player.apply_edge_collisions(arena_size)
+          |> Player.apply_weapon_fire()
+          |> Player.update_projectiles()
       )
     end)}
   end

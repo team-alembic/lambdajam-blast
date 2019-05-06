@@ -27,13 +27,20 @@ defmodule Blast.Player do
     # Engine power in newtons
     :engine_power,
     # The polygon
-    :polygon
+    :polygon,
+    # Whether the primary weapon is :firing or :not_firing
+    :primary_weapon,
+    # How many rounds are remaining
+    :primary_weapon_charge_remaining,
+    # A list of projectiles fired by the primary weapon
+    :projectiles,
   ]
 
   import Blast.Vector2D
   alias Blast.Vector2D
   import Blast.Physics
   alias Blast.Polygon
+  alias Blast.Projectile
 
   @max_allowed_speed 200
   @collision_velocity_multiplier 0.75
@@ -44,7 +51,10 @@ defmodule Blast.Player do
     :thrusters => :off,
     :engine_power => 80,
     :mass => 500,
-    :polygon => Polygon.new([{25, 0}, {40, 50}, {25, 40}, {10, 50}])
+    :polygon => Polygon.new([{25, 0}, {40, 50}, {25, 40}, {10, 50}]),
+    :primary_weapon => :not_firing,
+    :primary_weapon_charge_remaining => 10000,
+    :projectiles => []
   }
 
   def new(values = %{}) do
@@ -145,4 +155,39 @@ defmodule Blast.Player do
     }, arena_size)
   end
   def apply_edge_collisions(player = %__MODULE__{}, _), do: player
+
+  def apply_weapon_fire(player)
+  def apply_weapon_fire(player = %__MODULE__{
+    :primary_weapon => :firing,
+    :primary_weapon_charge_remaining => charge,
+    :projectiles => projectiles,
+    :orientation => firing_direction,
+    :velocity => player_velocity,
+    :position => projectile_base_position,
+    :polygon => player_polygon
+  }) when charge > 0 do
+    %__MODULE__{player |
+      :primary_weapon_charge_remaining => charge - 1,
+      :projectiles => [
+        Projectile.new(
+          # Vector2D.add(projectile_base_position, Polygon.centre_top(player_polygon)),
+          projectile_base_position,
+          Vector2D.add(firing_direction, Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)),
+          firing_direction
+        )
+        | projectiles
+      ]
+    }
+  end
+  def apply_weapon_fire(player = %__MODULE__{}), do: player
+
+  def update_projectiles(player = %__MODULE__{
+    projectiles: projectiles
+  }) do
+    %__MODULE__{player |
+      projectiles: projectiles |> Enum.map(fn (p = %Projectile{position: position, velocity: velocity}) ->
+        %Projectile{p | position: add(position, velocity)}
+      end)
+    }
+  end
 end

@@ -6,7 +6,6 @@ defmodule Blast.Physics do
   import Blast.Vector2D
   alias Blast.Vector2D
 
-
   @doc """
   Given an object with a position, velocity, mass, calculate the new position and velocity when a force
   is applied for a period of time.

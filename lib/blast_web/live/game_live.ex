@@ -11,6 +11,9 @@ defmodule BlastWeb.GameLive do
   import Blast.Vector2D
 
   def render(assigns) do
+    # TODO use SVG `defs` to define shapes once and reuse with different positions,
+    # transforms and rendering styles. This will drastically reduce the size of the
+    # rendered SVG DOM.
     ~L"""
     <svg id="arena" class="arena" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"
       phx-keydown="player_keydown"
@@ -20,6 +23,9 @@ defmodule BlastWeb.GameLive do
       <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
       <%= for player <- Map.values(@game_state.players) do %>
         <%= draw_player(player) %>
+      <% end %>
+      <%= for player <- Map.values(@game_state.players) do %>
+        <%= draw_player_projectiles(player) %>
       <% end %>
       <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
     </svg>
@@ -53,10 +59,25 @@ defmodule BlastWeb.GameLive do
       points="<%= player_polygon(polygon) %>"
       fill='white'
       transform='
-        translate(<%= position.x - player_centre_x(assigns) %>, <%= position.y - player_centre_y(assigns) %>)
-        rotate(<%= signed_angle_between(north(), unit(orientation)) %> <%= player_polygon_centre(assigns) %>)
+        translate(<%= position.x - polygon_centre_x(assigns) %>, <%= position.y - polygon_centre_y(assigns) %>)
+        rotate(<%= signed_angle_between(north(), unit(orientation)) %> <%= polygon_centre(assigns) %>)
       '
     />
+    """
+  end
+
+  defp draw_player_projectiles(assigns = %Player{projectiles: projectiles}) do
+    ~L"""
+    <%= for projectile <- projectiles do %>
+      <polygon
+        points="<%= player_projectile_polygon(projectile.polygon) %>"
+        fill='yellow'
+        transform='
+          translate(<%= projectile.position.x - polygon_centre_x(projectile) %>, <%= projectile.position.y - polygon_centre_y(assigns) %>)
+          rotate(<%= signed_angle_between(north(), unit(projectile.orientation)) %> <%= polygon_centre(assigns) %>)
+        '
+      />
+    <% end %>
     """
   end
 
@@ -64,17 +85,21 @@ defmodule BlastWeb.GameLive do
     raw vertices |> Enum.map(fn (%{x: x, y: y}) -> "#{x} #{y}" end) |> Enum.join(", ")
   end
 
-  defp player_polygon_centre(%Player{polygon: polygon}) do
+  defp player_projectile_polygon(%Polygon{vertices: vertices}) do
+    raw vertices |> Enum.map(fn (%{x: x, y: y}) -> "#{x} #{y}" end) |> Enum.join(", ")
+  end
+
+  defp polygon_centre(%{polygon: polygon}) do
     %{x: x, y: y} = Polygon.centre(polygon)
     raw "#{x} #{y}"
   end
 
-  defp player_centre_x(%Player{polygon: polygon}) do
+  defp polygon_centre_x(%{polygon: polygon}) do
     %{x: x} = Polygon.centre(polygon)
     x
   end
 
-  defp player_centre_y(%Player{polygon: polygon}) do
+  defp polygon_centre_y(%{polygon: polygon}) do
     %{y: y} = Polygon.centre(polygon)
     y
   end
@@ -86,5 +111,7 @@ defmodule BlastWeb.GameLive do
   defp handle_player_event(pid, player_id, "keyup", "ArrowRight"), do: GameServer.update_player(pid, player_id, %{:turning => :not_turning})
   defp handle_player_event(pid, player_id, "keydown", "ArrowUp"), do: GameServer.update_player(pid, player_id, %{:thrusters => :on})
   defp handle_player_event(pid, player_id, "keyup", "ArrowUp"), do: GameServer.update_player(pid, player_id, %{:thrusters => :off})
+  defp handle_player_event(pid, player_id, "keydown", " "), do: GameServer.update_player(pid, player_id, %{:primary_weapon => :firing})
+  defp handle_player_event(pid, player_id, "keyup", " "), do: GameServer.update_player(pid, player_id, %{:primary_weapon => :not_firing})
   defp handle_player_event(_, _, _, _), do: :ok
 end

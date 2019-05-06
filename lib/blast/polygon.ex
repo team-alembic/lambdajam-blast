@@ -24,4 +24,21 @@ defmodule Blast.Polygon do
 
     Vector2D.new(totalX / count, totalY / count)
   end
+
+  @doc """
+  Returns the `y` coordinate of the top-most vertex.
+  """
+  def top_y(%__MODULE__{vertices: vertices}) do
+    vertices
+    |> Enum.map(fn {_, y} -> y end)
+    |> Enum.reduce(0, &max(&1, &2))
+  end
+
+  @doc """
+  Gets the centre-top vertex
+  """
+  def centre_top(polygon = %__MODULE__{vertices: vertices}) do
+    %{x: x} = centre(polygon)
+    Vector2D.new(x, top_y(polygon))
+  end
 end
