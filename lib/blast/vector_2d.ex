@@ -39,9 +39,14 @@ defmodule Blast.Vector2D do
     end
   end
 
-  # TODO add test
+  # TODO: add test
   def add(%__MODULE__{x: x1, y: y1}, %__MODULE__{x: x2, y: y2}) do
     %__MODULE__{x: x1 + x2, y: y1 + y2}
+  end
+
+  # TODO: add test
+  def sub(%__MODULE__{x: x1, y: y1}, %__MODULE__{x: x2, y: y2}) do
+    %__MODULE__{x: x1 - x2, y: y1 - y2}
   end
 
   def multiply_mag(%__MODULE__{x: x, y: y}, multiplier) do

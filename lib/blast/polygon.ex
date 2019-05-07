@@ -34,7 +34,7 @@ defmodule Blast.Polygon do
   """
   def top_y(%__MODULE__{vertices: vertices}) do
     vertices
-    |> Enum.map(fn {_, y} -> y end)
+    |> Enum.map(fn %{y: y} -> y end)
     |> Enum.reduce(0, &max(&1, &2))
   end
 

@@ -12,13 +12,21 @@ defmodule Blast.Projectile do
   @doc """
   Creates a new PhysicObject as if fired by another PhysicsObject.
 
-  The projectile eminates from the top of the object's polygon.
+  The projectile emanates from the top of `fired_by.polygon`.
   """
-  def fired_by_object(%PhysicsObject{position: position, velocity: velocity, orientation: firing_direction}) do
+  def fired_by_object(fired_by)
+  def fired_by_object(%PhysicsObject{position: position, polygon: polygon, velocity: velocity, orientation: firing_direction}) do
+    offset = Vector2D.sub(Polygon.centre_top(polygon), Vector2D.new(0, Polygon.top_y(polygon) / 2))
     %PhysicsObject{
-      :position => position,
+      :position => Vector2D.add(
+        position,
+        Vector2D.rotate(
+          offset,
+          Vector2D.signed_angle_between(offset, firing_direction)
+        )
+      ),
       :orientation =>  firing_direction,
-      :velocity => Vector2D.add(firing_direction, Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)),
+      :velocity => Vector2D.add(velocity, Vector2D.add(firing_direction, Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10))),
       :mass => 5,
       :polygon => @polygon,
       :rebounds_remaining => 3,
