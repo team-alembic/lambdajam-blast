@@ -1,35 +1,29 @@
 defmodule Blast.Projectile do
   @moduledoc """
-  Represents a projectile fired by a player weapon.
+  Contains function to create a new PhysicsObject representing a projectile fired by a weapon.
   """
-  defstruct [
-    :position,
-    :velocity,
-    :orientation,
-    :polygon,
-    :rebounds_remaining
-  ]
 
-
-  alias Blast.Vector2D
   alias Blast.Polygon
+  alias Blast.PhysicsObject
+  alias Blast.Vector2D
 
   @polygon Polygon.new([{25 / 5, 0}, {40 / 5, 50 / 5}, {25 / 5, 40/ 5}, {10/ 5, 50 / 5}])
 
-  def new(position, velocity, orientation) do
-    %__MODULE__{
-      position: position,
-      velocity: velocity,
-      orientation: orientation,
-      polygon: @polygon,
-      rebounds_remaining: 3
-    }
-  end
+  @doc """
+  Creates a new PhysicObject as if fired by another PhysicsObject.
 
-  def apply_velocity(projectile = %__MODULE__{
-    position: position,
-    velocity: velocity
-  }) do
-    %__MODULE__{projectile | position: Vector2D.add(position, velocity)}
+  The projectile eminates from the top of the object's polygon.
+  """
+  def fired_by_object(%PhysicsObject{position: position, velocity: velocity, orientation: firing_direction}) do
+    %PhysicsObject{
+      :position => position,
+      :orientation =>  firing_direction,
+      :velocity => Vector2D.add(firing_direction, Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)),
+      :mass => 5,
+      :polygon => @polygon,
+      :rebounds_remaining => 3,
+      :rebound_velocity_adjustment => 1.0,
+      :max_allowed_speed => 1000
+    }
   end
 end

@@ -6,8 +6,8 @@ defmodule BlastWeb.GameLive do
   alias Phoenix.LiveView.Socket
 
   alias Blast.GameServer
-  alias Blast.Player
   alias Blast.Polygon
+  alias Blast.PhysicsObject
   import Blast.Vector2D
 
   def render(assigns) do
@@ -21,11 +21,8 @@ defmodule BlastWeb.GameLive do
       phx-target="window"
      >
       <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
-      <%= for player <- Map.values(@game_state.players) do %>
-        <%= draw_player(player) %>
-      <% end %>
-      <%= for player <- Map.values(@game_state.players) do %>
-        <%= draw_player_projectiles(player) %>
+      <%= for object <- Map.values(@game_state.objects) do %>
+        <%= draw_object(object) %>
       <% end %>
       <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
     </svg>
@@ -53,10 +50,10 @@ defmodule BlastWeb.GameLive do
 
   def handle_event(_, _, socket), do: {:noreply, socket}
 
-  defp draw_player(assigns = %Player{position: position, orientation: orientation, polygon: polygon}) do
+  defp draw_object(assigns = %PhysicsObject{position: position, orientation: orientation, polygon: polygon}) do
     ~L"""
     <polygon
-      points="<%= player_polygon(polygon) %>"
+      points="<%= render_polygon(polygon) %>"
       fill='white'
       transform='
         translate(<%= position.x - polygon_centre_x(assigns) %>, <%= position.y - polygon_centre_y(assigns) %>)
@@ -66,26 +63,7 @@ defmodule BlastWeb.GameLive do
     """
   end
 
-  defp draw_player_projectiles(assigns = %Player{projectiles: projectiles}) do
-    ~L"""
-    <%= for projectile <- projectiles do %>
-      <polygon
-        points="<%= player_projectile_polygon(projectile.polygon) %>"
-        fill='yellow'
-        transform='
-          translate(<%= projectile.position.x - polygon_centre_x(projectile) %>, <%= projectile.position.y - polygon_centre_y(assigns) %>)
-          rotate(<%= signed_angle_between(north(), unit(projectile.orientation)) %> <%= polygon_centre(assigns) %>)
-        '
-      />
-    <% end %>
-    """
-  end
-
-  defp player_polygon(%Polygon{vertices: vertices}) do
-    raw vertices |> Enum.map(fn (%{x: x, y: y}) -> "#{x} #{y}" end) |> Enum.join(", ")
-  end
-
-  defp player_projectile_polygon(%Polygon{vertices: vertices}) do
+  defp render_polygon(%Polygon{vertices: vertices}) do
     raw vertices |> Enum.map(fn (%{x: x, y: y}) -> "#{x} #{y}" end) |> Enum.join(", ")
   end
 
@@ -105,13 +83,13 @@ defmodule BlastWeb.GameLive do
   end
 
   defp handle_player_event(pid, player_id, event_type, event_data)
-  defp handle_player_event(pid, player_id, "keydown", "ArrowLeft"), do: GameServer.update_player(pid, player_id, %{:turning => :left})
-  defp handle_player_event(pid, player_id, "keyup", "ArrowLeft"), do: GameServer.update_player(pid, player_id, %{:turning => :not_turning})
-  defp handle_player_event(pid, player_id, "keydown", "ArrowRight"), do: GameServer.update_player(pid, player_id, %{:turning => :right})
-  defp handle_player_event(pid, player_id, "keyup", "ArrowRight"), do: GameServer.update_player(pid, player_id, %{:turning => :not_turning})
-  defp handle_player_event(pid, player_id, "keydown", "ArrowUp"), do: GameServer.update_player(pid, player_id, %{:thrusters => :on})
-  defp handle_player_event(pid, player_id, "keyup", "ArrowUp"), do: GameServer.update_player(pid, player_id, %{:thrusters => :off})
-  defp handle_player_event(pid, player_id, "keydown", " "), do: GameServer.update_player(pid, player_id, %{:primary_weapon => :firing})
-  defp handle_player_event(pid, player_id, "keyup", " "), do: GameServer.update_player(pid, player_id, %{:primary_weapon => :not_firing})
+  defp handle_player_event(pid, player_id, "keydown", "ArrowLeft"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :left})
+  defp handle_player_event(pid, player_id, "keyup", "ArrowLeft"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :not_turning})
+  defp handle_player_event(pid, player_id, "keydown", "ArrowRight"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :right})
+  defp handle_player_event(pid, player_id, "keyup", "ArrowRight"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :not_turning})
+  defp handle_player_event(pid, player_id, "keydown", "ArrowUp"), do: GameServer.update_fighter_controls(pid, player_id, %{:thrusters => :on})
+  defp handle_player_event(pid, player_id, "keyup", "ArrowUp"), do: GameServer.update_fighter_controls(pid, player_id, %{:thrusters => :off})
+  defp handle_player_event(pid, player_id, "keydown", " "), do: GameServer.update_fighter_controls(pid, player_id, %{:guns => :firing})
+  defp handle_player_event(pid, player_id, "keyup", " "), do: GameServer.update_fighter_controls(pid, player_id, %{:guns => :not_firing})
   defp handle_player_event(_, _, _, _), do: :ok
 end

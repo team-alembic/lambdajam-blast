@@ -27,8 +27,8 @@ defmodule Blast.GameServer do
     {:reply, game_state, state}
   end
 
-  def handle_call({:update_player, player_id, values}, _from, {token, game_state, event_buffer}) do
-    {:reply, :ok, {token, game_state, [{:update_player, player_id, values} | event_buffer]}}
+  def handle_call({:update_fighter_controls, player_id, values}, _from, {token, game_state, event_buffer}) do
+    {:reply, :ok, {token, game_state, [{:update_fighter_controls, player_id, values} | event_buffer]}}
   end
 
   def handle_call({:add_player, player_id}, _from, {token, game_state, event_buffer}) do
@@ -51,8 +51,8 @@ defmodule Blast.GameServer do
     GenServer.call(name, :game_state)
   end
 
-  def update_player(name, player_id, values = %{}) do
-    GenServer.call(name, {:update_player, player_id, values})
+  def update_fighter_controls(name, player_id, values = %{}) do
+    GenServer.call(name, {:update_fighter_controls, player_id, values})
   end
 end
 

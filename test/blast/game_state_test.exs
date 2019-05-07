@@ -44,25 +44,25 @@ defmodule Blast.GameStateTest do
       |> GameState.add_player("3")
       |> GameState.add_player("4")
 
-    # Player 1 is top-left pointing towards the centre (offset 50, 50)
+    # Fighter 1 is top-left pointing towards the centre (offset 50, 50)
     p1_expected_orientation = Vector2D.new(1, 1) |> Vector2D.unit()
     p1_expected_position = Vector2D.new(50, 50)
     assert GameState.player(new_state, "1").position == p1_expected_position
     assert GameState.player(new_state, "1").orientation == p1_expected_orientation
 
-    # Player 2 is top-right pointing towards the centre
+    # Fighter 2 is top-right pointing towards the centre
     p2_expected_orientation = Vector2D.new(-1, 1) |> Vector2D.unit()
     p2_expected_position = Vector2D.new(950, 50)
     assert GameState.player(new_state, "2").position == p2_expected_position
     assert GameState.player(new_state, "2").orientation == p2_expected_orientation
 
-    # Player 3 is bottom-left pointing towards the centre
+    # Fighter 3 is bottom-left pointing towards the centre
     p3_expected_orientation = Vector2D.new(1, -1) |> Vector2D.unit()
     p3_expected_position = Vector2D.new(50, 950)
     assert GameState.player(new_state, "3").position == p3_expected_position
     assert GameState.player(new_state, "3").orientation == p3_expected_orientation
 
-    # Player 4 is bottom-right pointing towards the centre
+    # Fighter 4 is bottom-right pointing towards the centre
     p4_expected_orientation = Vector2D.new(-1, -1) |> Vector2D.unit()
     p4_expected_position = Vector2D.new(950, 950)
     assert GameState.player(new_state, "4").position == p4_expected_position

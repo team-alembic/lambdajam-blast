@@ -2,35 +2,33 @@ defmodule Blast.GameState do
   @moduledoc """
   The state of an in-progress Game and the logic to compute the next state
   of the game based on previous state + inputs.
-
-  The state includes:
-
-  - each player that has joined the game
-  - the player sprite positions, orientations and velocities
-  - the position and velocity vectors of any projectiles
-  - the accumulated damage for each player
-  - the score for each player
-
-  The arena size is a square of dimensions `@arena_size` in world coordinates.
   """
-  defstruct [:arena_size, :players]
 
-  @max_players 4
-  @arena_size 1000
-
-  alias Blast.Player
+  alias Blast.Fighter
+  alias Blast.FighterControls
+  alias Blast.PhysicsObject
   alias Blast.Vector2D
 
+  use TypedStruct
+
+  typedstruct enforce: true do
+    field :arena_size, pos_integer(), default: 1000
+    field :max_players, pos_integer(), default: 4
+    field :fighters, %{integer() => Fighter.t()}, default: %{}
+    field :controls, %{integer() => FighterControls.t()}, default: %{}
+    field :objects, %{{(:fighter | :projectile), integer()} => PhysicsObject.t()}, default: %{}
+  end
+
   def new() do
-    %__MODULE__{arena_size: @arena_size, players: %{}}
+    %__MODULE__{}
   end
 
-  def player(%__MODULE__{players: players}, player_id) do
-    players[player_id]
+  def player(%__MODULE__{fighters: fighters}, player_id) do
+    fighters[player_id]
   end
 
-  def player_count(%__MODULE__{players: players}) do
-    length(Map.keys(players))
+  defp fighter_count(%__MODULE__{fighters: fighters}) do
+    map_size(fighters)
   end
 
   def process_events(game_state, frame_millis, event_buffer) do
@@ -39,7 +37,8 @@ defmodule Blast.GameState do
     |> Enum.reduce(game_state, fn (event, acc) ->
       process_event(acc, event)
     end)
-    |> update_players(frame_millis)
+    |> apply_fighter_controls(frame_millis)
+    |> update_positions()
   end
 
   # Processes one user-generated event and returns a new GameState.
@@ -48,17 +47,17 @@ defmodule Blast.GameState do
   defp process_event(game_state, {:add_player, player_id}) do
     game_state |> add_player(player_id)
   end
-  defp process_event(game_state, {:update_player, player_id, %{:turning => turning}}) do
-    %__MODULE__{players: %{^player_id => player}} = game_state
-    %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | turning: turning}}}
+  defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:turning => turning}}) do
+    %__MODULE__{controls: %{^fighter_id => controls}} = game_state
+    %__MODULE__{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_turning(turning)}}
   end
-  defp process_event(game_state, {:update_player, player_id, %{:thrusters => thrusting}}) do
-    %__MODULE__{players: %{^player_id => player}} = game_state
-    %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | thrusters: thrusting} }}
+  defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:thrusters => thrusting}}) do
+    %__MODULE__{controls: %{^fighter_id => controls}} = game_state
+    %__MODULE__{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_thrusters(thrusting)}}
   end
-  defp process_event(game_state, {:update_player, player_id, %{:primary_weapon => firing}}) do
-    %__MODULE__{players: %{^player_id => player}} = game_state
-    %__MODULE__{game_state | players: %{ game_state.players | player_id => %Player{player | primary_weapon: firing} }}
+  defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:guns => firing}}) do
+    %__MODULE__{controls: %{^fighter_id => controls}} = game_state
+    %__MODULE__{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_guns(firing)}}
   end
   defp process_event(game_state, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
@@ -75,36 +74,84 @@ defmodule Blast.GameState do
   defp initial_orientation(3), do: Vector2D.unit(Vector2D.new(1, -1))
   defp initial_orientation(4), do: Vector2D.unit(Vector2D.new(-1, -1))
 
-  def add_player(game_state = %__MODULE__{}, player_id) do
-    num_players = player_count(game_state)
-    if num_players < @max_players do
-      %__MODULE__{game_state | players: Map.put_new(
-        game_state.players,
-        player_id,
-        Player.new(%{
-          id: num_players + 1,
-          position: initial_positition(num_players + 1),
-          orientation: initial_orientation(num_players + 1)
-        })
-      )}
+
+  # Adds a player with `player_id` to the game.
+  # There's quite a bit of book keeping here: we need to add an associated
+  # Fighter struct, a FighterControls struct and a PhysicalObject.
+  defp add_player(game_state = %__MODULE__{max_players: max_players, fighters: fighters, controls: controls, objects: objects}, player_id) do
+    num_fighters = fighter_count(game_state)
+    if num_fighters < max_players do
+      fighter_id = num_fighters + 1
+      %__MODULE__{game_state |
+        fighters: Map.put_new(
+          fighters,
+          player_id,
+          Fighter.new(%{
+            id: fighter_id
+          })
+        ),
+        controls: Map.put_new(
+          controls,
+          player_id,
+          FighterControls.new(%{fighter_id: fighter_id})
+        ),
+        objects: Map.put_new(
+          objects,
+          {:fighter, player_id},
+          PhysicsObject.new(%{
+            position: initial_positition(fighter_id),
+            orientation: initial_orientation(fighter_id),
+            mass: Fighter.mass(),
+            polygon: Fighter.polygon(),
+            max_allowed_speed: Fighter.max_allowed_speed()
+          })
+        )
+      }
     else
       game_state
     end
   end
 
-  def update_players(game_state, frame_millis) do
-    %__MODULE__{players: players, arena_size: arena_size} = game_state
-    %__MODULE__{game_state | players: players |> Enum.reduce(%{}, fn ({player_id, player}, acc) ->
-      acc
-      |> Map.put(player_id,
-          player
-          |> Player.apply_turn(frame_millis)
-          |> Player.apply_thrust(frame_millis)
-          |> Player.apply_velocity()
-          |> Player.apply_edge_collisions(arena_size)
-          |> Player.apply_weapon_fire()
-          |> Player.update_projectiles()
+  defp apply_fighter_controls(game_state, frame_millis) do
+    game_state.controls
+    |> Enum.reduce(game_state, fn ({fighter_id, controls}, acc) ->
+      {fighter, object, projectiles} = FighterControls.apply(
+        controls, {
+          Map.get(game_state.fighters, fighter_id),
+          Map.get(game_state.objects, {:fighter, fighter_id}),
+          []
+        },
+        frame_millis
       )
-    end)}
+
+      %__MODULE__{ acc |
+        fighters: Map.put(game_state.fighters, fighter_id, fighter),
+        objects:
+          game_state.objects
+          |> Map.put({:fighter, fighter_id}, object)
+          |> add_projectiles(projectiles)
+      }
+    end)
+  end
+
+  defp update_positions(game_state) do
+    %__MODULE__{game_state | objects:
+      Enum.reduce(game_state.objects, %{}, fn ({key, object}, acc) ->
+        Map.put(
+          acc,
+          key,
+          object
+          |> PhysicsObject.apply_velocity()
+          |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
+        )
+      end)
+    }
+  end
+
+  defp add_projectiles(objects, projectiles) do
+    projectiles
+    |> Enum.reduce(objects, fn (projectile, acc) ->
+      acc |> Map.put({:projectile, Enum.random(0..999999999999)}, projectile)
+    end)
   end
 end

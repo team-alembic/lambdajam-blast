@@ -14,7 +14,7 @@ defmodule BlastWeb.GameController do
   alias Blast.GameServer
 
   @doc """
-  Joins a Player identified `player_id` from the session to a Game identified by `token`.
+  Joins a Fighter identified `player_id` from the session to a Game identified by `token`.
 
   This is an idempotent action: if the player is already joined the operation will be a no-op.
 

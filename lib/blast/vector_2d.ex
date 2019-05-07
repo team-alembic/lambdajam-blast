@@ -2,7 +2,12 @@ defmodule Blast.Vector2D do
   @moduledoc """
   Module for representing and performing operations on 2D mathematical vectors.
   """
-  defstruct [:x, :y]
+  use TypedStruct
+
+  typedstruct enforce: true do
+    field :x, float()
+    field :y, float()
+  end
 
   @degrees_per_radian 57.2958
 

@@ -7,7 +7,11 @@ defmodule Blast.Polygon do
   """
   alias Blast.Vector2D
 
-  defstruct [:vertices]
+  use TypedStruct
+
+  typedstruct enforce: true do
+    field :vertices, list(Vector2D.t())
+  end
 
   def new(points) when is_list(points) do
     %__MODULE__{vertices: points |> Enum.map(fn {x, y} -> Vector2D.new(x, y) end)}
