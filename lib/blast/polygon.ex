@@ -37,7 +37,7 @@ defmodule Blast.Polygon do
   @doc """
   Gets the centre-top vertex
   """
-  def centre_top(polygon = %__MODULE__{vertices: vertices}) do
+  def centre_top(polygon = %__MODULE__{}) do
     %{x: x} = centre(polygon)
     Vector2D.new(x, top_y(polygon))
   end

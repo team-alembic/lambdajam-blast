@@ -162,15 +162,15 @@ defmodule Blast.Player do
     :primary_weapon_charge_remaining => charge,
     :projectiles => projectiles,
     :orientation => firing_direction,
-    :velocity => player_velocity,
+    :velocity => _player_velocity,
     :position => projectile_base_position,
-    :polygon => player_polygon
+    :polygon => _player_polygon
   }) when charge > 0 do
     %__MODULE__{player |
       :primary_weapon_charge_remaining => charge - 1,
       :projectiles => [
+        # TODO: need to take into account player polygon and velocity when constructing the projectile.
         Projectile.new(
-          # Vector2D.add(projectile_base_position, Polygon.centre_top(player_polygon)),
           projectile_base_position,
           Vector2D.add(firing_direction, Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)),
           firing_direction
