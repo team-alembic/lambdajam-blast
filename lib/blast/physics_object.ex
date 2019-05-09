@@ -60,8 +60,10 @@ defmodule Blast.PhysicsObject do
   def apply_thrust(object = %PhysicsObject{}, _), do: object
 
 
-  # Calculate new velocity when force is applied to an object for a period of time.
-  defp apply_force(
+  @doc """
+  Calculate new velocity when force is applied to an object for a period of time.
+  """
+  def apply_force(
     velocity = %Vector2D{},
     mass_kg,
     force_newtons = %Vector2D{},

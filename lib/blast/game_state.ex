@@ -25,11 +25,11 @@ defmodule Blast.GameState do
     %GameState{}
   end
 
-  def player(%GameState{fighters: fighters}, player_id) do
+  def fighter(%GameState{fighters: fighters}, player_id) do
     fighters[player_id]
   end
 
-  defp fighter_count(%GameState{fighters: fighters}) do
+  def fighter_count(%GameState{fighters: fighters}) do
     map_size(fighters)
   end
 
@@ -81,7 +81,7 @@ defmodule Blast.GameState do
   # Adds a player with `player_id` to the game.
   # There's quite a bit of book keeping here: we need to add an associated
   # Fighter struct, a FighterControls struct and a PhysicalObject.
-  defp add_player(game_state = %GameState{max_players: max_players, fighters: fighters, controls: controls, objects: objects}, player_id) do
+  def add_player(game_state = %GameState{max_players: max_players, fighters: fighters, controls: controls, objects: objects}, player_id) do
     num_fighters = fighter_count(game_state)
     if num_fighters < max_players do
       fighter_id = num_fighters + 1
