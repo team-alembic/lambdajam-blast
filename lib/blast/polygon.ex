@@ -45,4 +45,13 @@ defmodule Blast.Polygon do
     %{x: x} = centre(polygon)
     Vector2D.new(x, top_y(polygon))
   end
+
+  @doc """
+  Returns the radius of an imaginary sphere centred on the centre of the polygon.
+  """
+  def bounding_sphere_radius(polygon = %__MODULE__{vertices: vertices}) do
+    c = centre(polygon)
+    biggest_v = Enum.max_by(vertices, fn (v) -> Vector2D.distance_between(v, c) end)
+    Vector2D.distance_between(biggest_v, c)
+  end
 end

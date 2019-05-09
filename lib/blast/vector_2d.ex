@@ -96,4 +96,8 @@ defmodule Blast.Vector2D do
       y: x * :math.sin(radians) + y * :math.cos(radians)
     }
   end
+
+  def distance_between(%__MODULE__{x: x1, y: y1}, %__MODULE__{x: x2, y: y2}) do
+    :math.sqrt(:math.pow(abs(x1 - x2), 2) + :math.pow(abs(x1 - x2), 2))
+  end
 end

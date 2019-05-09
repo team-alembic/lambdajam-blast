@@ -8,6 +8,7 @@ defmodule Blast.GameState do
   alias Blast.FighterControls
   alias Blast.PhysicsObject
   alias Blast.Vector2D
+  alias Blast.Collision
 
   use TypedStruct
 
@@ -39,6 +40,7 @@ defmodule Blast.GameState do
     end)
     |> apply_fighter_controls(frame_millis)
     |> update_positions()
+    |> check_collisions()
   end
 
   # Processes one user-generated event and returns a new GameState.
@@ -153,5 +155,11 @@ defmodule Blast.GameState do
     |> Enum.reduce(objects, fn (projectile, acc) ->
       acc |> Map.put({:projectile, Enum.random(0..999999999999)}, projectile)
     end)
+  end
+
+  defp check_collisions(game_state) do
+    _collisions = Collision.detect(game_state.objects)
+    # TODO: do something with the collision information
+    game_state
   end
 end
