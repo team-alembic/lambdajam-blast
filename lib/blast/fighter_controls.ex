@@ -7,6 +7,7 @@ defmodule Blast.FighterControls do
   alias Blast.PhysicsObject
   alias Blast.Projectile
   alias Blast.Fighter
+  alias Blast.FighterControls
 
   use TypedStruct
 
@@ -18,28 +19,28 @@ defmodule Blast.FighterControls do
   end
 
   def new(values = %{}) do
-    struct(__MODULE__, values)
+    struct(FighterControls, values)
   end
 
   @doc """
   Sets a value indicating that the player is initiating a left or right turn or not turning at all.
   """
-  def set_turning(controls = %__MODULE__{}, option) when option in [:right, :left, :not_turning] do
-    %__MODULE__{controls | turning: option}
+  def set_turning(controls = %FighterControls{}, option) when option in [:right, :left, :not_turning] do
+    %FighterControls{controls | turning: option}
   end
 
   @doc """
   Sets a value indicating that the player is firing the thrusters or not.
   """
-  def set_thrusters(controls = %__MODULE__{}, on_or_off) when on_or_off in [:on, :off] do
-    %__MODULE__{controls | thrusters: on_or_off}
+  def set_thrusters(controls = %FighterControls{}, on_or_off) when on_or_off in [:on, :off] do
+    %FighterControls{controls | thrusters: on_or_off}
   end
 
   @doc """
   Sets a value indicating that the player is firing the guns or not.
   """
-  def set_guns(controls = %__MODULE__{}, firing) when firing in [:firing, :not_firing] do
-    %__MODULE__{controls | guns: firing}
+  def set_guns(controls = %FighterControls{}, firing) when firing in [:firing, :not_firing] do
+    %FighterControls{controls | guns: firing}
   end
 
   @doc """
@@ -58,9 +59,9 @@ defmodule Blast.FighterControls do
   # `current_state` is of the form `{fighter, object, projectiles}`
   defp apply_turn(current_state, controls, time_delta)
 
-  defp apply_turn(t = {_, _, _}, %__MODULE__{turning: :not_turning}, _), do: t
+  defp apply_turn(t = {_, _, _}, %FighterControls{turning: :not_turning}, _), do: t
 
-  defp apply_turn(t = {_, object = %PhysicsObject{}, _}, %__MODULE__{turning: turn}, time_delta) do
+  defp apply_turn(t = {_, object = %PhysicsObject{}, _}, %FighterControls{turning: turn}, time_delta) do
     put_elem(t, 1, PhysicsObject.rotate(object, turn, time_delta))
   end
 
@@ -70,10 +71,10 @@ defmodule Blast.FighterControls do
   defp apply_thrust(current_state, controls, time_delta)
 
   # Thrusters are off, so nothing to do here.
-  defp apply_thrust(t = {_, _, _}, %__MODULE__{thrusters: :off}, _), do: t
+  defp apply_thrust(t = {_, _, _}, %FighterControls{thrusters: :off}, _), do: t
 
   # Thrusters are on, so apply fighter's engine power as thrust to the physics object.
-  defp apply_thrust(t = {%Fighter{engine_power: newtons}, object = %PhysicsObject{}, _}, %__MODULE__{thrusters: :on}, time_delta) do
+  defp apply_thrust(t = {%Fighter{engine_power: newtons}, object = %PhysicsObject{}, _}, %FighterControls{thrusters: :on}, time_delta) do
     put_elem(t, 1, PhysicsObject.apply_thrust(object, newtons, time_delta))
   end
 
@@ -82,10 +83,10 @@ defmodule Blast.FighterControls do
   defp fire_guns(current_state, controls)
 
   # Nothing to do when the guns aren't firing.
-  defp fire_guns(t = {_, _, _}, %__MODULE__{guns: :not_firing}), do: t
+  defp fire_guns(t = {_, _, _}, %FighterControls{guns: :not_firing}), do: t
 
   # Create a new projectile and deplete the figher's energy weapon charge.
-  defp fire_guns({fighter = %Fighter{charge_remaining: charge}, object, projectiles}, %__MODULE__{guns: :firing}) when charge > 0 do
+  defp fire_guns({fighter = %Fighter{charge_remaining: charge}, object, projectiles}, %FighterControls{guns: :firing}) when charge > 0 do
     {%Fighter{fighter | charge_remaining: charge - 1}, object, [Projectile.fired_by_object(object) | projectiles]}
   end
 

@@ -7,6 +7,8 @@ defmodule Blast.Fighter do
   The id is used to determine the initial positions.
   """
 
+  alias Blast.Fighter
+
   use TypedStruct
 
   typedstruct enforce: true do
@@ -23,6 +25,6 @@ defmodule Blast.Fighter do
   def mass, do: 500
 
   def new(values = %{}) do
-    struct(__MODULE__, values)
+    struct(Fighter, values)
   end
 end

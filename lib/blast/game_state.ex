@@ -9,6 +9,7 @@ defmodule Blast.GameState do
   alias Blast.PhysicsObject
   alias Blast.Vector2D
   alias Blast.Collision
+  alias Blast.GameState
 
   use TypedStruct
 
@@ -21,14 +22,14 @@ defmodule Blast.GameState do
   end
 
   def new() do
-    %__MODULE__{}
+    %GameState{}
   end
 
-  def player(%__MODULE__{fighters: fighters}, player_id) do
+  def player(%GameState{fighters: fighters}, player_id) do
     fighters[player_id]
   end
 
-  defp fighter_count(%__MODULE__{fighters: fighters}) do
+  defp fighter_count(%GameState{fighters: fighters}) do
     map_size(fighters)
   end
 
@@ -50,16 +51,16 @@ defmodule Blast.GameState do
     game_state |> add_player(player_id)
   end
   defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:turning => turning}}) do
-    %__MODULE__{controls: %{^fighter_id => controls}} = game_state
-    %__MODULE__{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_turning(turning)}}
+    %GameState{controls: %{^fighter_id => controls}} = game_state
+    %GameState{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_turning(turning)}}
   end
   defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:thrusters => thrusting}}) do
-    %__MODULE__{controls: %{^fighter_id => controls}} = game_state
-    %__MODULE__{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_thrusters(thrusting)}}
+    %GameState{controls: %{^fighter_id => controls}} = game_state
+    %GameState{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_thrusters(thrusting)}}
   end
   defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:guns => firing}}) do
-    %__MODULE__{controls: %{^fighter_id => controls}} = game_state
-    %__MODULE__{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_guns(firing)}}
+    %GameState{controls: %{^fighter_id => controls}} = game_state
+    %GameState{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_guns(firing)}}
   end
   defp process_event(game_state, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
@@ -80,11 +81,11 @@ defmodule Blast.GameState do
   # Adds a player with `player_id` to the game.
   # There's quite a bit of book keeping here: we need to add an associated
   # Fighter struct, a FighterControls struct and a PhysicalObject.
-  defp add_player(game_state = %__MODULE__{max_players: max_players, fighters: fighters, controls: controls, objects: objects}, player_id) do
+  defp add_player(game_state = %GameState{max_players: max_players, fighters: fighters, controls: controls, objects: objects}, player_id) do
     num_fighters = fighter_count(game_state)
     if num_fighters < max_players do
       fighter_id = num_fighters + 1
-      %__MODULE__{game_state |
+      %GameState{game_state |
         fighters: Map.put_new(
           fighters,
           player_id,
@@ -126,7 +127,7 @@ defmodule Blast.GameState do
         frame_millis
       )
 
-      %__MODULE__{ acc |
+      %GameState{ acc |
         fighters: Map.put(game_state.fighters, fighter_id, fighter),
         objects:
           game_state.objects
@@ -137,7 +138,7 @@ defmodule Blast.GameState do
   end
 
   defp update_positions(game_state) do
-    %__MODULE__{game_state | objects:
+    %GameState{game_state | objects:
       Enum.reduce(game_state.objects, %{}, fn ({key, object}, acc) ->
         Map.put(
           acc,
