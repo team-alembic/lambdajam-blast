@@ -29,11 +29,9 @@ defmodule Blast.GameState do
     fighters[player_id]
   end
 
-  def fighter_count(%GameState{fighters: fighters}) do
-    map_size(fighters)
-  end
+  def fighter_count(%GameState{fighters: fighters}), do: map_size(fighters)
 
-  def process_events(game_state, frame_millis, event_buffer) do
+  def process_events(game_state = %GameState{}, frame_millis, event_buffer) do
     event_buffer
     |> Enum.uniq()
     |> Enum.reduce(game_state, fn (event, acc) ->
@@ -41,7 +39,7 @@ defmodule Blast.GameState do
     end)
     |> apply_fighter_controls(frame_millis)
     |> update_positions()
-    |> check_collisions()
+    |> apply_collisions()
   end
 
   # Processes one user-generated event and returns a new GameState.
@@ -158,9 +156,48 @@ defmodule Blast.GameState do
     end)
   end
 
-  defp check_collisions(game_state) do
-    _collisions = Collision.detect(game_state.objects)
-    # TODO: do something with the collision information
-    game_state
+  defp apply_collisions(game_state) do
+    Collision.detect(game_state.objects)
+    |> Enum.reduce(game_state, &collide/2)
   end
+
+  defp collide({{:fighter, id1, obj1}, {:fighter, id2, obj2}}, game_state) do
+    %{^id1 => fighter1, ^id2 => fighter2} = game_state.fighters
+
+    {obj1_updated, obj2_updated} =
+      PhysicsObject.elastic_collision(obj1, obj2)
+
+    %GameState{game_state |
+      # 1. set same fixed damage (-5 integrity) on each fighter
+      fighters: %{game_state.fighters |
+        id1 => %Fighter{fighter1 | integrity: fighter1.integrity - 5},
+        id2 => %Fighter{fighter2 | integrity: fighter2.integrity - 5}
+      },
+      # 2. apply deflection
+      objects: %{game_state.objects |
+        {:fighter, id1} => obj1_updated,
+        {:fighter, id2} => obj2_updated
+      }
+    }
+  end
+
+  defp collide({{:projectile, id1, obj1}, {:fighter, id2, obj2}}, game_state) do
+    %{^id2 => fighter} = game_state.fighters
+
+    {obj1_updated, obj2_updated} =
+      PhysicsObject.elastic_collision(obj1, obj2)
+
+    %GameState{game_state |
+      # 1. set same fixed damage (-10 integrity) on the fighter
+      fighters: %{game_state.fighters |
+        id2 => %Fighter{fighter | integrity: fighter.integrity - 10}
+      },
+      # 2. apply deflection
+      objects: %{game_state.objects |
+        {:projectile, id1} => obj1_updated,
+        {:fighter, id2} => obj2_updated
+      }
+    }
+  end
+  defp collide(_, game_state), do: game_state
 end

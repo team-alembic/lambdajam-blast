@@ -68,4 +68,12 @@ defmodule Blast.GameStateTest do
     assert new_state.objects[{:fighter, "4"}].position == p4_expected_position
     assert new_state.objects[{:fighter, "4"}].orientation == p4_expected_orientation
   end
+
+  test "applies damage on fighter collisions", %{state: state}  do
+    new_state = state
+      |> GameState.add_player("1")
+      |> GameState.add_player("2")
+
+
+  end
 end

@@ -41,14 +41,17 @@ defmodule Blast.Collision do
 
     all_pairs = Enum.concat(fighter_pairs, fighter_projectile_pairs)
 
-    all_pairs |> Enum.filter(& collided?(&1))
+    all_pairs |> Enum.filter(fn ({{_, _, obj1}, {_, _, obj2}}) ->
+      collided?(obj1, obj2)
+    end)
   end
 
-  defp collided?({{_, obj1}, {_, obj2}}) do
+  defp collided?(obj1, obj2) do
     r1 = Polygon.bounding_sphere_radius(obj1.polygon)
     r2 = Polygon.bounding_sphere_radius(obj2.polygon)
-    d = Vector2D.distance_between(obj1.position, obj2.position) - r1 - r2
-    d <= r1 || d <= r2
+    distance_between_centres =
+      Vector2D.distance_between(obj1.position, obj2.position)
+    distance_between_centres <= (r1 + r2)
   end
 
   defp of_type(objects, requested_type) do
@@ -56,7 +59,7 @@ defmodule Blast.Collision do
     |> Enum.filter(fn ({{actual_type, _}, _}) ->
       requested_type == actual_type
     end)
-    |> Enum.map(fn ({{_, id}, obj}) -> {id, obj} end)
+    |> Enum.map(fn ({{type, id}, obj}) -> {type, id, obj} end)
   end
 
   # Gets unique pairs of values.

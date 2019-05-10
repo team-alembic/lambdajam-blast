@@ -118,4 +118,36 @@ defmodule Blast.PhysicsObject do
     }, arena_size)
   end
   def apply_edge_collisions(object = %PhysicsObject{}, _), do: object
+
+  @doc """
+  Calculates the elastic collision between two objects.
+  Returns a tuple of {PhysicalObject.t(), PhysicalObject.t()}.
+  """
+  def elastic_collision(obj1 = %PhysicsObject{}, obj2 = %PhysicsObject{}) do
+    {
+      %PhysicsObject{obj1 | velocity: compute_collision_for_one_oject(obj1, obj2)},
+      %PhysicsObject{obj2 | velocity: compute_collision_for_one_oject(obj2, obj1)}
+    }
+  end
+
+  # See: https://stackoverflow.com/questions/35211114/2d-elastic-ball-collision-physics
+  defp compute_collision_for_one_oject(obj, other_obj) do
+    mass_part = (2 * other_obj.mass) / (obj.mass + other_obj.mass)
+
+    position_delta = Vector2D.sub(obj.position, other_obj.position)
+
+    Vector2D.sub(
+      obj.velocity,
+      Vector2D.multiply_mag(
+        position_delta,
+        mass_part * (
+          Vector2D.dot(
+            Vector2D.sub(obj.velocity, other_obj.velocity),
+            position_delta
+          ) /
+          :math.pow(Vector2D.mag(position_delta), 2)
+        )
+      )
+    )
+  end
 end

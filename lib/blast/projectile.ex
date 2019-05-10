@@ -9,6 +9,8 @@ defmodule Blast.Projectile do
 
   @polygon Polygon.new([{25 / 5, 0}, {40 / 5, 50 / 5}, {25 / 5, 40/ 5}, {10/ 5, 50 / 5}])
 
+  def polygon, do: @polygon
+
   @doc """
   Creates a new PhysicObject as if fired by another PhysicsObject.
 

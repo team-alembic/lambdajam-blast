@@ -15,6 +15,7 @@ defmodule Blast.Fighter do
     field :id, pos_integer()
     field :engine_power, pos_integer(), default: 80
     field :charge_remaining, pos_integer(), default: 1000
+    field :integrity, pos_integer(), default: 100
   end
 
   alias Blast.Polygon
