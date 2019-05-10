@@ -97,24 +97,28 @@ defmodule Blast.PhysicsObject do
     apply_edge_collisions(%PhysicsObject{object |
       velocity: object.velocity |> Vector2D.invert_x() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
       position: %Vector2D{object.position | x: arena_size},
+      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
     }, arena_size)
   end
   def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{x: x}}, arena_size) when x < 0 do
     apply_edge_collisions(%PhysicsObject{object |
       velocity: object.velocity |> Vector2D.invert_x() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
       position: %Vector2D{object.position | x: 0},
+      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
     }, arena_size)
   end
   def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{y: y}}, arena_size) when y > arena_size do
     apply_edge_collisions(%PhysicsObject{object |
       velocity: object.velocity |> Vector2D.invert_y() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
       position: %Vector2D{object.position | y: arena_size},
+      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
     }, arena_size)
   end
   def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{y: y}}, arena_size) when y < 0 do
     apply_edge_collisions(%PhysicsObject{object |
       velocity: object.velocity |> Vector2D.invert_y() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
       position: %Vector2D{object.position | y: 0},
+      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
     }, arena_size)
   end
   def apply_edge_collisions(object = %PhysicsObject{}, _), do: object
@@ -150,4 +154,7 @@ defmodule Blast.PhysicsObject do
       )
     )
   end
+
+  defp calc_rebounds_remaining(:unlimited), do: :unlimited
+  defp calc_rebounds_remaining(n), do: n - 1
 end

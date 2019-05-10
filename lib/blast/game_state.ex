@@ -40,6 +40,7 @@ defmodule Blast.GameState do
     |> apply_fighter_controls(frame_millis)
     |> update_positions()
     |> apply_collisions()
+    |> reap()
   end
 
   # Processes one user-generated event and returns a new GameState.
@@ -197,4 +198,18 @@ defmodule Blast.GameState do
     }
   end
   defp collide(_, game_state), do: game_state
+
+  defp reap(game_state = %GameState{}) do
+    %GameState{game_state |
+      objects: game_state.objects
+        |> drop_objects_with_no_rebounds_remaining()
+    }
+  end
+
+  defp drop_objects_with_no_rebounds_remaining(objects) do
+    objects
+    |> Enum.map(& &1)
+    |> Enum.filter(fn ({_, obj}) -> obj.rebounds_remaining == :unlimited || obj.rebounds_remaining >= 0 end)
+    |> Enum.into(%{})
+  end
 end
