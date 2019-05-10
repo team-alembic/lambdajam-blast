@@ -184,7 +184,7 @@ defmodule Blast.GameState do
   defp collide({{:projectile, id1, obj1}, {:fighter, id2, obj2}}, game_state) do
     %{^id2 => fighter} = game_state.fighters
 
-    {obj1_updated, obj2_updated} =
+    {_, obj2_updated} =
       PhysicsObject.elastic_collision(obj1, obj2)
 
     %GameState{game_state |
@@ -193,10 +193,7 @@ defmodule Blast.GameState do
         id2 => %Fighter{fighter | integrity: fighter.integrity - 10}
       },
       # 2. apply deflection
-      objects: %{game_state.objects |
-        {:projectile, id1} => obj1_updated,
-        {:fighter, id2} => obj2_updated
-      }
+      objects: %{game_state.objects | {:fighter, id2} => obj2_updated } |> Map.delete({:projectile, id1})
     }
   end
   defp collide(_, game_state), do: game_state
