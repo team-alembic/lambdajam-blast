@@ -49,17 +49,11 @@ defmodule Blast.GameState do
   defp process_event(game_state, {:add_player, player_id}) do
     game_state |> add_player(player_id)
   end
-  defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:turning => turning}}) do
-    %GameState{controls: %{^fighter_id => controls}} = game_state
-    %GameState{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_turning(turning)}}
-  end
-  defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:thrusters => thrusting}}) do
-    %GameState{controls: %{^fighter_id => controls}} = game_state
-    %GameState{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_thrusters(thrusting)}}
-  end
-  defp process_event(game_state, {:update_fighter_controls, fighter_id, %{:guns => firing}}) do
-    %GameState{controls: %{^fighter_id => controls}} = game_state
-    %GameState{game_state | controls: %{ game_state.controls | fighter_id => controls |> FighterControls.set_guns(firing)}}
+  defp process_event(game_state, {:update_fighter_controls, player_id, changes}) do
+    %GameState{controls: %{^player_id => controls}} = game_state
+    %GameState{game_state | controls: %{game_state.controls |
+      player_id => controls |> FighterControls.update(changes)}
+    }
   end
   defp process_event(game_state, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
@@ -85,21 +79,21 @@ defmodule Blast.GameState do
     if num_fighters < max_players do
       fighter_id = num_fighters + 1
       %GameState{game_state |
-        fighters: Map.put_new(
-          fighters,
-          player_id,
-          Fighter.new(%{
-            id: fighter_id
-          })
-        ),
         controls: Map.put_new(
           controls,
           player_id,
           FighterControls.new(%{fighter_id: fighter_id})
         ),
+        fighters: Map.put_new(
+          fighters,
+          fighter_id,
+          Fighter.new(%{
+            id: fighter_id
+          })
+        ),
         objects: Map.put_new(
           objects,
-          {:fighter, player_id},
+          {:fighter, fighter_id},
           PhysicsObject.new(%{
             position: initial_positition(fighter_id),
             orientation: initial_orientation(fighter_id),
@@ -116,21 +110,21 @@ defmodule Blast.GameState do
 
   defp apply_fighter_controls(game_state, frame_millis) do
     game_state.controls
-    |> Enum.reduce(game_state, fn ({fighter_id, controls}, acc) ->
+    |> Enum.reduce(game_state, fn ({_, controls}, acc) ->
       {fighter, object, projectiles} = FighterControls.apply(
         controls, {
-          Map.get(game_state.fighters, fighter_id),
-          Map.get(game_state.objects, {:fighter, fighter_id}),
+          Map.get(game_state.fighters, controls.fighter_id),
+          Map.get(game_state.objects, {:fighter, controls.fighter_id}),
           []
         },
         frame_millis
       )
 
       %GameState{ acc |
-        fighters: Map.put(game_state.fighters, fighter_id, fighter),
+        fighters: Map.put(game_state.fighters, controls.fighter_id, fighter),
         objects:
           game_state.objects
-          |> Map.put({:fighter, fighter_id}, object)
+          |> Map.put({:fighter, controls.fighter_id}, object)
           |> add_projectiles(projectiles)
       }
     end)

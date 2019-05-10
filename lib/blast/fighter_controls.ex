@@ -22,26 +22,17 @@ defmodule Blast.FighterControls do
     struct(FighterControls, values)
   end
 
-  @doc """
-  Sets a value indicating that the player is initiating a left or right turn or not turning at all.
-  """
-  def set_turning(controls = %FighterControls{}, option) when option in [:right, :left, :not_turning] do
-    %FighterControls{controls | turning: option}
+  def update(controls = %FighterControls{}, values = %{turning: turning}) when turning in [:right, :left, :not_turning] do
+    update(struct(controls, values), Map.delete(values, :turning))
   end
+  def update(controls = %FighterControls{}, values = %{thrusters: thrusters}) when thrusters in [:on, :off] do
+    update(struct(controls, values), Map.delete(values, :thrusters))
+  end
+  def update(controls = %FighterControls{}, values = %{guns: guns}) when guns in [:firing, :not_firing] do
+    update(struct(controls, values), Map.delete(values, :guns))
+  end
+  def update(controls = %FighterControls{}, _), do: controls
 
-  @doc """
-  Sets a value indicating that the player is firing the thrusters or not.
-  """
-  def set_thrusters(controls = %FighterControls{}, on_or_off) when on_or_off in [:on, :off] do
-    %FighterControls{controls | thrusters: on_or_off}
-  end
-
-  @doc """
-  Sets a value indicating that the player is firing the guns or not.
-  """
-  def set_guns(controls = %FighterControls{}, firing) when firing in [:firing, :not_firing] do
-    %FighterControls{controls | guns: firing}
-  end
 
   @doc """
   Applies the control input and returns a tuple of new structs to be incorporated into the game state.
