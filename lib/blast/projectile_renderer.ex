@@ -11,18 +11,17 @@ defimpl Blast.GameObjectRenderer, for: Blast.Projectile do
   @impl true
   def render_object(
         assigns = %Projectile{
-          object: %PhysicsObject{polygon: polygon, position: position, orientation: orientation}
+          object: %PhysicsObject{position: position}
         }
       ) do
     ~L"""
-    <polygon
-      points="<%= render_polygon(polygon) %>"
-      fill='red'
-      transform='
-        translate(<%= position.x - polygon_centre_x(polygon) %>, <%= position.y - polygon_centre_y(polygon) %>)
-        rotate(<%= Vector2D.signed_angle_between(Vector2D.north(), Vector2D.unit(orientation)) %> <%= polygon_centre(polygon) %>)
-      '
-    />
+    <circle
+      cx="<%= position.x %>"
+      cy="<%= position.y %>"
+      r="3"
+      opacity='1'
+      fill='yellow'
+     />
     """
   end
 end
