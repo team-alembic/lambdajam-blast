@@ -41,7 +41,7 @@ defmodule Blast.Projectile do
         :velocity => calc_velocity(velocity, firing_direction),
         :mass => 5,
         :polygon => @polygon,
-        :rebounds_remaining => 3,
+        :rebounds_remaining => 1,
         :rebound_velocity_adjustment => 1.0,
         :max_allowed_speed => 1000
       }
