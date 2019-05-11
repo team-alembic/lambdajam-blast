@@ -42,16 +42,23 @@ defmodule Blast.Vector2D do
     end
   end
 
-  # TODO: add test
+  @doc """
+  Add two vectors together.
+  """
   def add(%Vector2D{x: x1, y: y1}, %Vector2D{x: x2, y: y2}) do
     %Vector2D{x: x1 + x2, y: y1 + y2}
   end
 
-  # TODO: add test
+  @doc """
+  Subtract one vector from another.
+  """
   def sub(%Vector2D{x: x1, y: y1}, %Vector2D{x: x2, y: y2}) do
     %Vector2D{x: x1 - x2, y: y1 - y2}
   end
 
+  @doc """
+  Multiply the magnitude of the vector by a multiplier.
+  """
   def multiply_mag(%Vector2D{x: x, y: y}, multiplier) do
     %Vector2D{x: x * multiplier, y: y * multiplier}
   end
@@ -79,10 +86,16 @@ defmodule Blast.Vector2D do
     :math.atan2(cross(v1, v2), dot(v1, v2)) * @degrees_per_radian
   end
 
+  @doc """
+  Negate the `x` component of the vector.
+  """
   def invert_x(%Vector2D{x: x, y: y}) do
     %Vector2D{x: -x, y: y}
   end
 
+  @doc """
+  Negate the `y` component of the vector.
+  """
   def invert_y(%Vector2D{x: x, y: y}) do
     %Vector2D{x: x, y: -y}
   end
@@ -101,6 +114,9 @@ defmodule Blast.Vector2D do
     }
   end
 
+  @doc """
+  Return the distance between two vectors using Pythagoras Theorem.
+  """
   def distance_between(%Vector2D{x: x1, y: y1}, %Vector2D{x: x2, y: y2}) do
     :math.sqrt(
       :math.pow(abs(x1 - x2), 2) +
