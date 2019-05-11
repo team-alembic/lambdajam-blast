@@ -182,7 +182,7 @@ defmodule Blast.GameState do
       PhysicsObject.elastic_collision(fighter1.object, fighter2.object)
 
     update(game_state, %{
-      fighters: Map.update(game_state.fighters, %{
+      fighters: Map.merge(game_state.fighters, %{
         fighter1.id => Fighter.update(fighter1, %{
           integrity: fighter1.integrity - 5,
           object: obj1_updated
