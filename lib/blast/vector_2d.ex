@@ -123,4 +123,12 @@ defmodule Blast.Vector2D do
         :math.pow(abs(y1 - y2), 2)
     )
   end
+
+  def random(x_range, y_range) do
+    new(Enum.random(x_range), Enum.random(y_range))
+  end
+
+  def unit_random() do
+    random(-10000..10000, -10000..10000) |> unit()
+  end
 end
