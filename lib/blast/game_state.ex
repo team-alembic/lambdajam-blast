@@ -204,4 +204,8 @@ defmodule Blast.GameState do
   def count_projectiles(game_state) do
     length(game_state.projectiles)
   end
+
+  def game_objects(%GameState{fighters: fighters, projectiles: projectiles}) do
+    List.flatten([Map.values(fighters) | projectiles])
+  end
 end

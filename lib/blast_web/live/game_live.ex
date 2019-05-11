@@ -6,6 +6,7 @@ defmodule BlastWeb.GameLive do
 
   alias Blast.GameServer
   alias Blast.GameObjectRenderer
+  alias Blast.GameState
 
 
   def render(assigns) do
@@ -19,11 +20,8 @@ defmodule BlastWeb.GameLive do
       phx-target="window"
      >
       <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
-      <%= for fighter <- Map.values(@game_state.fighters) do %>
+      <%= for fighter <- GameState.game_objects(@game_state) do %>
         <%= GameObjectRenderer.render_object(fighter) %>
-      <% end %>
-      <%= for projectile <- @game_state.projectiles do %>
-        <%= GameObjectRenderer.render_object(projectile) %>
       <% end %>
       <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
     </svg>
