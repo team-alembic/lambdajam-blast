@@ -14,7 +14,7 @@ defmodule BlastWeb.UserSocket do
   # To deny connection, return `:error`.
   #
   # See `Phoenix.Token` documentation for examples in
-  # performing token verification on connect.
+  # performing game_id verification on connect.
   def connect(_params, socket, _connect_info) do
     {:ok, socket}
   end

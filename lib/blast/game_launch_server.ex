@@ -5,8 +5,8 @@ defmodule Blast.GameLaunchServer do
   # Responsibilities
 
   - Launches GameServers (supervised GenServers)
-  - GameServers have a token (which will be used in the URL for joining a game)
-  - GameSevers are registered in a Registry process and are identified by their token
+  - GameServers have a game_id (which will be used in the URL for joining a game)
+  - GameSevers are registered in a Registry process and are identified by their game_id
   """
   use GenServer
 
@@ -23,8 +23,8 @@ defmodule Blast.GameLaunchServer do
   end
 
   def handle_call({:new}, _from, counter) do
-    {:ok, token} = launch_game_server(counter)
-    {:reply, {:ok, token}, counter + 1}
+    {:ok, game_id} = launch_game_server(counter)
+    {:reply, {:ok, game_id}, counter + 1}
   end
 
   def new() do
@@ -32,10 +32,10 @@ defmodule Blast.GameLaunchServer do
   end
 
   defp launch_game_server(counter) do
-    token = generate_token(counter)
-    name = {:via, Registry, {GameServerRegistry, token}}
+    game_id = generate_token(counter)
+    name = {:via, Registry, {GameServerRegistry, game_id}}
     {:ok, _} = GameServer.start_link(name: name)
-    {:ok, token}
+    {:ok, game_id}
   end
 
   defp generate_token(counter) do

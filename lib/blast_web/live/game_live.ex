@@ -19,19 +19,19 @@ defmodule BlastWeb.GameLive do
       phx-target="window"
      >
       <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
-      <%= for fighter <- GameState.game_objects(@game_state) do %>
-        <%= GameObjectRenderer.render_object(fighter) %>
+      <%= for game_object <- GameState.game_objects(@game_state) do %>
+        <%= GameObjectRenderer.render_object(game_object) %>
       <% end %>
       <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
     </svg>
     """
   end
 
-  def mount(assigns = %{:token => token}, socket) do
+  def mount(assigns = %{:game_id => game_id}, socket) do
     if connected?(socket) do
-      :ok = subscribe(Blast.PubSub, "game/#{token}")
+      :ok = subscribe(Blast.PubSub, "game/#{game_id}")
     else
-      :ok = unsubscribe(Blast.PubSub, "game/#{token}")
+      :ok = unsubscribe(Blast.PubSub, "game/#{game_id}")
     end
 
     {:ok, assign(socket, assigns)}
@@ -44,9 +44,9 @@ defmodule BlastWeb.GameLive do
   def handle_event(
         "player_" <> event_type,
         event_data,
-        socket = %Socket{assigns: %{token: token, active_player: player_id}}
+        socket = %Socket{assigns: %{game_id: game_id, active_player: player_id}}
       ) do
-    [{pid, _}] = Registry.lookup(GameServerRegistry, token)
+    [{pid, _}] = Registry.lookup(GameServerRegistry, game_id)
     handle_player_event(pid, player_id, event_type, event_data)
     {:noreply, socket}
   end

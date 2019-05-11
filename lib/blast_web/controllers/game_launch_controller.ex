@@ -11,7 +11,7 @@ defmodule BlastWeb.GameLaunchController do
   end
 
   def create(conn, _params) do
-    {:ok, token} = GameLaunchServer.new()
-    render(conn, "game.html", token: token)
+    {:ok, game_id} = GameLaunchServer.new()
+    render(conn, "game.html", game_id: game_id)
   end
 end

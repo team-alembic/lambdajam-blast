@@ -14,13 +14,13 @@ defmodule Blast.GameServer do
 
   @millis_per_server_frame 16
 
-  def start_link(name: name = {_, _, {_, token}}) do
-    GenServer.start_link(__MODULE__, [token], name: name)
+  def start_link(name: name = {_, _, {_, game_id}}) do
+    GenServer.start_link(__MODULE__, [game_id], name: name)
   end
 
-  def init([token]) do
+  def init([game_id]) do
     Process.send_after(self(), :process_events, @millis_per_server_frame)
-    {:ok, {token, GameState.new(), []}}
+    {:ok, {game_id, GameState.new(), []}}
   end
 
   def handle_call(:game_state, _from, state = {_, game_state, _}) do
@@ -30,24 +30,24 @@ defmodule Blast.GameServer do
   def handle_call(
         {:update_fighter_controls, player_id, values},
         _from,
-        {token, game_state, event_buffer}
+        {game_id, game_state, event_buffer}
       ) do
     {:reply, :ok,
-     {token, game_state, [{:update_fighter_controls, player_id, values} | event_buffer]}}
+     {game_id, game_state, [{:update_fighter_controls, player_id, values} | event_buffer]}}
   end
 
-  def handle_call({:add_player, player_id}, _from, {token, game_state, event_buffer}) do
-    {:reply, :ok, {token, game_state, [{:add_player, player_id} | event_buffer]}}
+  def handle_call({:add_player, player_id}, _from, {game_id, game_state, event_buffer}) do
+    {:reply, :ok, {game_id, game_state, [{:add_player, player_id} | event_buffer]}}
   end
 
-  def handle_info(:process_events, {token, game_state, event_buffer}) do
+  def handle_info(:process_events, {game_id, game_state, event_buffer}) do
     next_game_state =
       game_state
       |> GameState.process_events(@millis_per_server_frame, event_buffer)
 
-    broadcast(Blast.PubSub, "game/#{token}", {:game_state_updated, next_game_state})
+    broadcast(Blast.PubSub, "game/#{game_id}", {:game_state_updated, next_game_state})
     Process.send_after(self(), :process_events, @millis_per_server_frame)
-    {:noreply, {token, next_game_state, []}}
+    {:noreply, {game_id, next_game_state, []}}
   end
 
   def add_player(name, player_id) do

@@ -21,7 +21,7 @@ defmodule BlastWeb.Router do
     get "/", GameLaunchController, :index
     post "/", GameLaunchController, :create
 
-    match :get, "/game/:token", GameController, :join_game
+    match :get, "/game/:game_id", GameController, :join_game
   end
 
   # Other scopes may use custom stacks.
