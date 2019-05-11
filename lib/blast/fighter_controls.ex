@@ -22,6 +22,11 @@ defmodule Blast.FighterControls do
     struct(FighterControls, values)
   end
 
+  @doc """
+  Returns a new FighterControls struct with fields updated from `values`.
+  """
+  def update(controls, values)
+
   def update(controls = %FighterControls{}, values = %{turning: turning})
       when turning in [:right, :left, :not_turning] do
     update(struct(controls, values), Map.delete(values, :turning))
@@ -42,17 +47,17 @@ defmodule Blast.FighterControls do
   @doc """
   Applies the control input and returns a tuple of new structs to be incorporated into the game state.
 
-  Returns a tuple of updated state of the form {Fighter.t(), PhysicsObject.t(), list(Projectile.t())}
+  Returns a tuple of updated state of the form {Fighter.t(), list(Projectile.t())}
   """
-  def apply(controls, t = {%Fighter{}, []}, time_delta) do
-    t
+  def apply(controls, fighter_and_projectiles = {%Fighter{}, []}, time_delta) do
+    fighter_and_projectiles
     |> apply_turn(controls, time_delta)
     |> apply_thrust(controls, time_delta)
     |> fire_guns(controls)
   end
 
   # Makes the PhysicsObject actually perform the turn.
-  # `current_state` is of the form `{fighter, object, projectiles}`
+  # `current_state` is of the form {Fighter.t(), list(Projectile.t())}
   defp apply_turn(current_state, controls, time_delta)
 
   defp apply_turn({fighter, projectiles}, %FighterControls{turning: :not_turning}, _),
