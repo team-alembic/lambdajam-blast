@@ -1,10 +1,18 @@
 defmodule Blast.RenderHelpers do
+  @moduledoc """
+  Helper functions for rendering Polygons as SVG.
+  """
   alias Blast.Polygon
 
   use Phoenix.HTML
 
   def render_polygon(%Polygon{vertices: vertices}) do
-    raw(vertices |> Enum.map(fn %{x: x, y: y} -> "#{x} #{y}" end) |> Enum.join(", "))
+    raw(
+      Enum.map(vertices, fn %{x: x, y: y} ->
+        "#{x} #{y}"
+      end)
+      |> Enum.join(", ")
+    )
   end
 
   def polygon_centre(polygon = %Polygon{}) do

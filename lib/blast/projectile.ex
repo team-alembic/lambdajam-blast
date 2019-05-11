@@ -23,7 +23,7 @@ defmodule Blast.Projectile do
   @doc """
   Creates a new Projectile as if fired by a Fighter.
 
-  The projectile emanates from the top of `fired_by.object.polygon`.
+  The projectile emanates from the front (north) of `fired_by.object.polygon`.
   """
   def fired_by(fighter = %Fighter{}) do
     %PhysicsObject{

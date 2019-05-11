@@ -81,7 +81,7 @@ defmodule Blast.CollisionTest do
              )
   end
 
-  defp fighter(values = %{} \\ %{}) do
+  defp fighter(values = %{}) do
     %Fighter{
       id: values.id,
       object:

@@ -1,6 +1,6 @@
 defmodule Blast.PhysicsObject do
   @moduledoc """
-  This represents an object with mass, velicity etc that forces can be applied to.
+  This represents an object with mass, velocity etc that forces can be applied to.
   """
 
   alias Blast.Vector2D
