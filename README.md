@@ -52,6 +52,10 @@ include the full host name (not localhost!).
 
 Perhaps set the hostname as an env var before running the server?
 
+### Basic: Improve rendering performance by rounding precision of vertex data
+
+This will reduce the size of the DOM diff sent from the server to the browser.
+
 ### Basic: Scoring
 
 Implement the scoring rules above and display live scores during the game.
@@ -79,16 +83,22 @@ is the player with the most points.
 
 ### Intermediate: Add sound effects using the HTML5 audio element
 
-Pre-canned sound effects are in the repo.
+Pre-canned sound effects are in the repo in `assets/static/sfx` and are served from `$HOST/sfx/file.wav`.
 
-The sounds must be served via a static route.
+Details here:
+
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
+
+The audio tags could be rendered by GameLive before or after the svg element. You'll need have some
+book-keeping state to know when to clean up tags that have finished playing.
 
 ### Intermediate: Animate some thruster exhaust
 
 Render an exhaust plume out of the back of the fighter. Start simple - a non animated static
 triangle representing a flame would suffice. Animate it for bonus points. Get creative - you
 could offload the animation to a CSS animation of an SVG shape and just toggle a class on an
-element.
+element. That way keeping track of a temporal animation on the server and all of the book
+keeping that it would entail can be avoided.
 
 ### Intermediate: Powerup items
 
