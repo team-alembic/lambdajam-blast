@@ -88,13 +88,12 @@ defmodule Blast.GameState do
     num_fighters = fighter_count(game_state)
     if can_add_player?(game_state, player_id) do
       fighter_id = num_fighters + 1
-      %GameState{
-        game_state
-        | controls:
-            Map.put_new(game_state.controls, player_id, make_controls(fighter_id)),
-          fighters:
-            Map.put_new(game_state.fighters, fighter_id, make_fighter(fighter_id))
-      }
+      update(game_state, %{
+        controls:
+          Map.put_new(game_state.controls, player_id, make_controls(fighter_id)),
+        fighters:
+          Map.put_new(game_state.fighters, fighter_id, make_fighter(fighter_id))
+      })
     else
       game_state
     end
@@ -128,54 +127,49 @@ defmodule Blast.GameState do
     game_state.controls
     |> Enum.reduce(game_state, fn {_, controls}, acc ->
       {fighter, projectiles} =
-        controls
-        |> FighterControls.apply(
+        FighterControls.apply(
+          controls,
           {Map.get(game_state.fighters, controls.fighter_id), []},
           frame_millis
         )
 
-      %GameState{
-        acc
-        | fighters: Map.put(acc.fighters, controls.fighter_id, fighter),
-          projectiles: projectiles ++ acc.projectiles
-      }
+      update(acc, %{
+        fighters: Map.put(acc.fighters, controls.fighter_id, fighter),
+        projectiles: projectiles ++ acc.projectiles
+      })
     end)
   end
 
   defp update_positions(game_state, :fighters) do
-    %GameState{
-      game_state
-      | fighters:
-          Enum.reduce(game_state.fighters, %{}, fn {id, fighter}, acc ->
-            Map.put(
-              acc,
-              id,
-              %Fighter{
-                fighter
-                | object:
-                    fighter.object
-                    |> PhysicsObject.apply_velocity()
-                    |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
-              }
-            )
-          end)
-    }
+    update(game_state, %{
+      fighters:
+        Enum.reduce(game_state.fighters, %{}, fn {id, fighter}, acc ->
+          Map.put(
+            acc,
+            id,
+            Fighter.update(fighter, %{
+              object:
+                fighter.object
+                |> PhysicsObject.apply_velocity()
+                |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
+            })
+          )
+        end)
+    })
   end
 
   defp update_positions(game_state, :projectiles) do
-    %GameState{
-      game_state
-      | projectiles:
-          Enum.map(game_state.projectiles, fn projectile ->
-            %Projectile{
-              projectile
-              | object:
-                  projectile.object
-                  |> PhysicsObject.apply_velocity()
-                  |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
-            }
-          end)
-    }
+    update(game_state, %{
+      projectiles:
+        Enum.map(game_state.projectiles, fn projectile ->
+          Projectile.update(projectile, %{
+            object:
+              projectile.object
+              |> PhysicsObject.apply_velocity()
+              |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
+          })
+        end)
+    })
   end
 
   defp apply_collisions(game_state) do
@@ -187,53 +181,51 @@ defmodule Blast.GameState do
     {obj1_updated, obj2_updated} =
       PhysicsObject.elastic_collision(fighter1.object, fighter2.object)
 
-    %GameState{
-      game_state
-      | fighters: %{
-          game_state.fighters
-          | fighter1.id => %Fighter{
-              fighter1
-              | integrity: fighter1.integrity - 5,
-                object: obj1_updated
-            },
-            fighter2.id => %Fighter{
-              fighter2
-              | integrity: fighter2.integrity - 5,
-                object: obj2_updated
-            }
-        }
-    }
+    update(game_state, %{
+      fighters: Map.update(game_state.fighters, %{
+        fighter1.id => Fighter.update(fighter1, %{
+          integrity: fighter1.integrity - 5,
+          object: obj1_updated
+        }),
+        fighter2.id => Fighter.update(fighter2, %{
+          integrity: fighter2.integrity - 5,
+          object: obj2_updated
+        })
+      })
+    })
   end
 
   defp collide({projectile = %Projectile{}, fighter = %Fighter{}}, game_state) do
     {_, updated_fighter_obj} = PhysicsObject.elastic_collision(projectile.object, fighter.object)
 
-    %GameState{
-      game_state
-      | fighters: %{
-          game_state.fighters
-          | fighter.id => %Fighter{
-              fighter
-              | integrity: fighter.integrity - 10,
-                object: updated_fighter_obj
-            }
-        },
-        projectiles: List.delete(game_state.projectiles, projectile)
-    }
+    firing_fighter = Map.get(game_state.fighters, projectile.fired_by_fighter_id)
+
+    update(game_state, %{
+      fighters: Map.merge(game_state.fighters, %{
+        fighter.id => Fighter.update(fighter, %{
+          integrity: fighter.integrity - 10,
+          object: updated_fighter_obj,
+          score: fighter.score - 10
+        }),
+        firing_fighter.id => Fighter.update(firing_fighter, %{
+          score: firing_fighter.score + 10,
+        })
+      }),
+      projectiles: List.delete(game_state.projectiles, projectile)
+    })
   end
 
   defp collide(_, game_state), do: game_state
 
   defp reap(game_state = %GameState{}, :projectiles) do
-    %GameState{
-      game_state
-      | projectiles:
-          game_state.projectiles
-          |> Enum.filter(fn projectile ->
-            projectile.object.rebounds_remaining == :unlimited ||
-              projectile.object.rebounds_remaining >= 0
-          end)
-    }
+    update(game_state, %{
+      projectiles:
+        game_state.projectiles
+        |> Enum.filter(fn projectile ->
+          projectile.object.rebounds_remaining == :unlimited ||
+            projectile.object.rebounds_remaining >= 0
+        end)
+    })
   end
 
   def count_projectiles(game_state) do
@@ -242,5 +234,9 @@ defmodule Blast.GameState do
 
   def game_objects(%GameState{fighters: fighters, projectiles: projectiles}) do
     List.flatten([Map.values(fighters) | projectiles])
+  end
+
+  defp update(game_state = %GameState{}, values = %{}) do
+    struct(game_state, values)
   end
 end

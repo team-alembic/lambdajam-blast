@@ -30,4 +30,11 @@ defmodule Blast.Fighter do
   def new(values = %{}) do
     struct(Fighter, values)
   end
+
+  @doc """
+  Update a fighter with new values
+  """
+  def update(f = %Fighter{}, values = %{}) do
+    struct(f, values)
+  end
 end

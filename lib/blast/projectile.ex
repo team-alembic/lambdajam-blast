@@ -48,6 +48,10 @@ defmodule Blast.Projectile do
     }
   end
 
+  def update(p = %Projectile{}, values = %{}) do
+    struct(p, values)
+  end
+
   defp calc_position(base_position, offset, firing_direction) do
     Vector2D.add(
       base_position,
