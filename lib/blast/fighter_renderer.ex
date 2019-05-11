@@ -1,13 +1,14 @@
 defimpl Blast.GameObjectRenderer, for: Blast.Fighter do
-  alias Blast.Polygon
   alias Blast.PhysicsObject
   alias Blast.Fighter
   alias Blast.Vector2D
 
   import Blast.RenderHelpers
 
-  use Phoenix.LiveView
+  require Phoenix.LiveView
+  import Phoenix.LiveView, only: :macros
 
+  @impl true
   def render_object(
         assigns = %Fighter{
           colour: colour,

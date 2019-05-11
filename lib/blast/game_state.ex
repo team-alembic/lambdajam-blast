@@ -84,41 +84,44 @@ defmodule Blast.GameState do
   defp initial_colour(3), do: "orange"
   defp initial_colour(4), do: "pink"
 
-  def add_player(game_state = %GameState{}, player_id) do
+  defp add_player(game_state = %GameState{}, player_id) do
     num_fighters = fighter_count(game_state)
-
-    if num_fighters < game_state.max_players && !Map.has_key?(game_state.controls, player_id) do
+    if can_add_player?(game_state, player_id) do
       fighter_id = num_fighters + 1
-
       %GameState{
         game_state
         | controls:
-            Map.put_new(
-              game_state.controls,
-              player_id,
-              FighterControls.new(%{fighter_id: fighter_id})
-            ),
+            Map.put_new(game_state.controls, player_id, make_controls(fighter_id)),
           fighters:
-            Map.put_new(
-              game_state.fighters,
-              fighter_id,
-              Fighter.new(%{
-                id: fighter_id,
-                colour: initial_colour(fighter_id),
-                object:
-                  PhysicsObject.new(%{
-                    position: initial_positition(fighter_id),
-                    orientation: initial_orientation(fighter_id),
-                    mass: Fighter.mass(),
-                    polygon: Fighter.polygon(),
-                    max_allowed_speed: Fighter.max_allowed_speed()
-                  })
-              })
-            )
+            Map.put_new(game_state.fighters, fighter_id, make_fighter(fighter_id))
       }
     else
       game_state
     end
+  end
+
+  defp can_add_player?(game_state, player_id) do
+    num_fighters = fighter_count(game_state)
+    num_fighters < game_state.max_players && !Map.has_key?(game_state.controls, player_id)
+  end
+
+  defp make_controls(fighter_id) do
+    FighterControls.new(%{fighter_id: fighter_id})
+  end
+
+  defp make_fighter(fighter_id) do
+    Fighter.new(%{
+      id: fighter_id,
+      colour: initial_colour(fighter_id),
+      object:
+        PhysicsObject.new(%{
+          position: initial_positition(fighter_id),
+          orientation: initial_orientation(fighter_id),
+          mass: Fighter.mass(),
+          polygon: Fighter.polygon(),
+          max_allowed_speed: Fighter.max_allowed_speed()
+        })
+    })
   end
 
   defp apply_fighter_controls(game_state, frame_millis) do
