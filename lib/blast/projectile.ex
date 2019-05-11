@@ -21,46 +21,24 @@ defmodule Blast.Projectile do
   end
 
   @doc """
-  Creates a new PhysicObject as if fired by another PhysicsObject.
+  Creates a new Projectile as if fired by a Fighter.
 
-  The projectile emanates from the top of `fired_by.polygon`.
+  The projectile emanates from the top of `fired_by.object.polygon`.
   """
-  def fired_by(fired_by)
-
   def fired_by(fighter = %Fighter{}) do
     %PhysicsObject{
-      position: position,
+      position: base_position,
       polygon: polygon,
       velocity: velocity,
       orientation: firing_direction
     } = fighter.object
 
-    offset =
-      Vector2D.sub(
-        Polygon.centre_top(polygon),
-        Vector2D.new(0, Polygon.top_y(polygon) / 2)
-      )
-
     %Projectile{
       fired_by_fighter_id: fighter.id,
       object: %PhysicsObject{
-        :position =>
-          Vector2D.add(
-            position,
-            Vector2D.rotate(
-              offset,
-              Vector2D.signed_angle_between(offset, firing_direction)
-            )
-          ),
+        :position => calc_position(base_position, calc_offset(polygon), firing_direction),
         :orientation => firing_direction,
-        :velocity =>
-          Vector2D.add(
-            velocity,
-            Vector2D.add(
-              firing_direction,
-              Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)
-            )
-          ),
+        :velocity => calc_velocity(velocity, firing_direction),
         :mass => 5,
         :polygon => @polygon,
         :rebounds_remaining => 3,
@@ -68,5 +46,32 @@ defmodule Blast.Projectile do
         :max_allowed_speed => 1000
       }
     }
+  end
+
+  defp calc_position(base_position, offset, firing_direction) do
+    Vector2D.add(
+      base_position,
+      Vector2D.rotate(
+        offset,
+        Vector2D.signed_angle_between(offset, firing_direction)
+      )
+    )
+  end
+
+  defp calc_offset(polygon) do
+    Vector2D.sub(
+      Polygon.centre_top(polygon),
+      Vector2D.new(0, Polygon.top_y(polygon) / 2)
+    )
+  end
+
+  defp calc_velocity(velocity, firing_direction) do
+    Vector2D.add(
+      velocity,
+      Vector2D.add(
+        firing_direction,
+        Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)
+      )
+    )
   end
 end

@@ -14,7 +14,10 @@ defmodule Blast.GameStateTest do
 
   test "add player", %{state: state} do
     assert state |> GameState.fighter_count() == 0
-    new_state = state |> GameState.add_player("1234")
+    new_state = state
+      |> GameState.process_events(16, [
+        {:add_player, "1234"}
+      ])
     assert new_state |> GameState.fighter_count() == 1
   end
 
@@ -23,8 +26,10 @@ defmodule Blast.GameStateTest do
 
     new_state =
       state
-      |> GameState.add_player("1234")
-      |> GameState.add_player("1234")
+      |> GameState.process_events(16, [
+        {:add_player, "1234"},
+        {:add_player, "1234"},
+      ])
 
     assert new_state |> GameState.fighter_count() == 1
   end
@@ -32,22 +37,25 @@ defmodule Blast.GameStateTest do
   test "only allows four players", %{state: state} do
     new_state =
       state
-      |> GameState.add_player("1")
-      |> GameState.add_player("2")
-      |> GameState.add_player("3")
-      |> GameState.add_player("4")
-      |> GameState.add_player("5")
-
-    assert length(Map.keys(new_state.fighters)) == 4
+      |> GameState.process_events(16, [
+        {:add_player, "1"},
+        {:add_player, "2"},
+        {:add_player, "3"},
+        {:add_player, "4"},
+        {:add_player, "5"}
+      ])
+    assert map_size(new_state.fighters) == 4
   end
 
   test "player initial positions and orientations", %{state: state} do
     new_state =
       state
-      |> GameState.add_player("1")
-      |> GameState.add_player("2")
-      |> GameState.add_player("3")
-      |> GameState.add_player("4")
+      |> GameState.process_events(16, [
+        {:add_player, "1"},
+        {:add_player, "2"},
+        {:add_player, "3"},
+        {:add_player, "4"}
+      ])
 
     # Fighter 1 is top-left pointing towards the centre (offset 50, 50)
     p1_expected_orientation = Vector2D.new(1, 1) |> Vector2D.unit()
@@ -77,8 +85,10 @@ defmodule Blast.GameStateTest do
   test "controls work for single player", %{state: state} do
     new_state =
       state
-      |> GameState.add_player("1")
-      |> GameState.process_events(16, [{:update_fighter_controls, "1", %{:guns => :firing}}])
+      |> GameState.process_events(16, [
+        {:add_player, "1"},
+        {:update_fighter_controls, "1", %{:guns => :firing}}
+      ])
 
     assert GameState.count_projectiles(new_state) == 1
   end
@@ -86,9 +96,11 @@ defmodule Blast.GameStateTest do
   test "controls work for multiple players", %{state: state} do
     new_state =
       state
-      |> GameState.add_player("1")
-      |> GameState.add_player("2")
-      |> GameState.process_events(16, [{:update_fighter_controls, "1", %{:guns => :firing}}])
+      |> GameState.process_events(16, [
+        {:add_player, "1"},
+        {:add_player, "2"},
+        {:update_fighter_controls, "1", %{:guns => :firing}}
+      ])
 
     assert GameState.count_projectiles(new_state) == 1
   end

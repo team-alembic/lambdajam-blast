@@ -28,8 +28,15 @@ defmodule Blast.Collision do
     |> Enum.filter(&collided?/1)
   end
 
+  defp fighter_fighter_pairs([]), do: []
+  defp fighter_fighter_pairs([_]), do: []
   defp fighter_fighter_pairs(fighters) do
-    for f1 <- fighters, f2 <- fighters, f1 !== f2, do: {f1, f2}
+    for f1 <- fighters, f2 <- fighters, f1 !== f2 do
+      [f1, f2]
+      |> Enum.sort()
+      |> List.to_tuple()
+    end
+    |> Enum.uniq()
   end
 
   defp fighter_projectile_pairs(fighters, projectiles) do
