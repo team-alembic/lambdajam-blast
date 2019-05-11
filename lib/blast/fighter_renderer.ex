@@ -8,7 +8,12 @@ defimpl Blast.GameObjectRenderer, for: Blast.Fighter do
 
   use Phoenix.LiveView
 
-  def render_object(assigns = %Fighter{colour: colour, object: %PhysicsObject{polygon: polygon, position: position, orientation: orientation}}) do
+  def render_object(
+        assigns = %Fighter{
+          colour: colour,
+          object: %PhysicsObject{polygon: polygon, position: position, orientation: orientation}
+        }
+      ) do
     ~L"""
     <polygon
       points="<%= render_polygon(polygon) %>"

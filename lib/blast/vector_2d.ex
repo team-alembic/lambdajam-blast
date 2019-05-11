@@ -34,6 +34,7 @@ defmodule Blast.Vector2D do
   """
   def unit(v = %Vector2D{x: x, y: y}) do
     len = mag(v)
+
     if len > 0 do
       %Vector2D{x: x / len, y: y / len}
     else
@@ -92,7 +93,8 @@ defmodule Blast.Vector2D do
   +ve degrees are right, -ve are left
   """
   def rotate(%Vector2D{x: x, y: y}, degrees) do
-    radians = degrees * (:math.pi / 180)
+    radians = degrees * (:math.pi() / 180)
+
     %Vector2D{
       x: x * :math.cos(radians) - y * :math.sin(radians),
       y: x * :math.sin(radians) + y * :math.cos(radians)
@@ -102,7 +104,7 @@ defmodule Blast.Vector2D do
   def distance_between(%Vector2D{x: x1, y: y1}, %Vector2D{x: x2, y: y2}) do
     :math.sqrt(
       :math.pow(abs(x1 - x2), 2) +
-      :math.pow(abs(y1 - y2), 2)
+        :math.pow(abs(y1 - y2), 2)
     )
   end
 end

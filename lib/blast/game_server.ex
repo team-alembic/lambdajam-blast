@@ -14,7 +14,7 @@ defmodule Blast.GameServer do
 
   @millis_per_server_frame 16
 
-  def start_link([name: name = {_, _, {_, token}}]) do
+  def start_link(name: name = {_, _, {_, token}}) do
     GenServer.start_link(__MODULE__, [token], name: name)
   end
 
@@ -27,8 +27,13 @@ defmodule Blast.GameServer do
     {:reply, game_state, state}
   end
 
-  def handle_call({:update_fighter_controls, player_id, values}, _from, {token, game_state, event_buffer}) do
-    {:reply, :ok, {token, game_state, [{:update_fighter_controls, player_id, values} | event_buffer]}}
+  def handle_call(
+        {:update_fighter_controls, player_id, values},
+        _from,
+        {token, game_state, event_buffer}
+      ) do
+    {:reply, :ok,
+     {token, game_state, [{:update_fighter_controls, player_id, values} | event_buffer]}}
   end
 
   def handle_call({:add_player, player_id}, _from, {token, game_state, event_buffer}) do
@@ -36,8 +41,10 @@ defmodule Blast.GameServer do
   end
 
   def handle_info(:process_events, {token, game_state, event_buffer}) do
-    next_game_state = game_state
-    |> GameState.process_events(@millis_per_server_frame, event_buffer)
+    next_game_state =
+      game_state
+      |> GameState.process_events(@millis_per_server_frame, event_buffer)
+
     broadcast(Blast.PubSub, "game/#{token}", {:game_state_updated, next_game_state})
     Process.send_after(self(), :process_events, @millis_per_server_frame)
     {:noreply, {token, next_game_state, []}}
@@ -55,4 +62,3 @@ defmodule Blast.GameServer do
     GenServer.call(name, {:update_fighter_controls, player_id, values})
   end
 end
-

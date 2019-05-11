@@ -9,7 +9,7 @@ defmodule Blast.Projectile do
   alias Blast.Fighter
   alias Blast.Projectile
 
-  @polygon Polygon.new([{25 / 5, 0}, {40 / 5, 50 / 5}, {25 / 5, 40/ 5}, {10/ 5, 50 / 5}])
+  @polygon Polygon.new([{25 / 5, 0}, {40 / 5, 50 / 5}, {25 / 5, 40 / 5}, {10 / 5, 50 / 5}])
 
   def polygon, do: @polygon
 
@@ -26,6 +26,7 @@ defmodule Blast.Projectile do
   The projectile emanates from the top of `fired_by.polygon`.
   """
   def fired_by(fired_by)
+
   def fired_by(fighter = %Fighter{}) do
     %PhysicsObject{
       position: position,
@@ -34,29 +35,32 @@ defmodule Blast.Projectile do
       orientation: firing_direction
     } = fighter.object
 
-    offset = Vector2D.sub(
-      Polygon.centre_top(polygon),
-      Vector2D.new(0, Polygon.top_y(polygon) / 2)
-    )
+    offset =
+      Vector2D.sub(
+        Polygon.centre_top(polygon),
+        Vector2D.new(0, Polygon.top_y(polygon) / 2)
+      )
 
     %Projectile{
       fired_by_fighter_id: fighter.id,
       object: %PhysicsObject{
-        :position => Vector2D.add(
-          position,
-          Vector2D.rotate(
-            offset,
-            Vector2D.signed_angle_between(offset, firing_direction)
-          )
-        ),
-        :orientation =>  firing_direction,
-        :velocity => Vector2D.add(
-          velocity,
+        :position =>
           Vector2D.add(
-            firing_direction,
-            Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)
-          )
-        ),
+            position,
+            Vector2D.rotate(
+              offset,
+              Vector2D.signed_angle_between(offset, firing_direction)
+            )
+          ),
+        :orientation => firing_direction,
+        :velocity =>
+          Vector2D.add(
+            velocity,
+            Vector2D.add(
+              firing_direction,
+              Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10)
+            )
+          ),
         :mass => 5,
         :polygon => @polygon,
         :rebounds_remaining => 3,

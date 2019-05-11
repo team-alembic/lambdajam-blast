@@ -23,7 +23,8 @@ defmodule Blast.Polygon do
     count = length(vertices)
 
     {totalX, totalY} =
-      vertices |> Enum.reduce({0, 0}, fn (%{x: x, y: y}, {sumX, sumY}) ->
+      vertices
+      |> Enum.reduce({0, 0}, fn %{x: x, y: y}, {sumX, sumY} ->
         {sumX + x, sumY + y}
       end)
 
@@ -52,7 +53,7 @@ defmodule Blast.Polygon do
   """
   def bounding_sphere_radius(polygon = %Polygon{vertices: vertices}) do
     c = centre(polygon)
-    biggest_v = Enum.max_by(vertices, fn (v) -> Vector2D.distance_between(v, c) end)
+    biggest_v = Enum.max_by(vertices, fn v -> Vector2D.distance_between(v, c) end)
     Vector2D.distance_between(biggest_v, c)
   end
 end

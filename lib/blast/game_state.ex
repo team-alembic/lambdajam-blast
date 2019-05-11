@@ -35,7 +35,7 @@ defmodule Blast.GameState do
   def process_events(game_state = %GameState{}, frame_millis, event_buffer) do
     event_buffer
     |> Enum.uniq()
-    |> Enum.reduce(game_state, fn (event, acc) ->
+    |> Enum.reduce(game_state, fn event, acc ->
       process_event(acc, event)
     end)
     |> apply_fighter_controls(frame_millis)
@@ -49,16 +49,21 @@ defmodule Blast.GameState do
   # i.e. updates positions of all of the players and projectiles.
   defp process_event(game_state, event)
   defp process_event(game_state, {:add_player, player_id}), do: add_player(game_state, player_id)
+
   defp process_event(game_state, {:update_fighter_controls, player_id, changes}) do
     %GameState{controls: %{^player_id => controls}} = game_state
-    %GameState{game_state |
-      controls: Map.put(
-        game_state.controls,
-        player_id,
-        FighterControls.update(controls, changes)
-      )
+
+    %GameState{
+      game_state
+      | controls:
+          Map.put(
+            game_state.controls,
+            player_id,
+            FighterControls.update(controls, changes)
+          )
     }
   end
+
   defp process_event(game_state, event) do
     IO.inspect("Unknown event: #{inspect(event)}")
     game_state
@@ -81,29 +86,35 @@ defmodule Blast.GameState do
 
   def add_player(game_state = %GameState{}, player_id) do
     num_fighters = fighter_count(game_state)
+
     if num_fighters < game_state.max_players && !Map.has_key?(game_state.controls, player_id) do
       fighter_id = num_fighters + 1
-      %GameState{game_state |
-        controls: Map.put_new(
-          game_state.controls,
-          player_id,
-          FighterControls.new(%{fighter_id: fighter_id})
-        ),
-        fighters: Map.put_new(
-          game_state.fighters,
-          fighter_id,
-          Fighter.new(%{
-            id: fighter_id,
-            colour: initial_colour(fighter_id),
-            object: PhysicsObject.new(%{
-              position: initial_positition(fighter_id),
-              orientation: initial_orientation(fighter_id),
-              mass: Fighter.mass(),
-              polygon: Fighter.polygon(),
-              max_allowed_speed: Fighter.max_allowed_speed()
-            })
-          })
-        )
+
+      %GameState{
+        game_state
+        | controls:
+            Map.put_new(
+              game_state.controls,
+              player_id,
+              FighterControls.new(%{fighter_id: fighter_id})
+            ),
+          fighters:
+            Map.put_new(
+              game_state.fighters,
+              fighter_id,
+              Fighter.new(%{
+                id: fighter_id,
+                colour: initial_colour(fighter_id),
+                object:
+                  PhysicsObject.new(%{
+                    position: initial_positition(fighter_id),
+                    orientation: initial_orientation(fighter_id),
+                    mass: Fighter.mass(),
+                    polygon: Fighter.polygon(),
+                    max_allowed_speed: Fighter.max_allowed_speed()
+                  })
+              })
+            )
       }
     else
       game_state
@@ -112,44 +123,55 @@ defmodule Blast.GameState do
 
   defp apply_fighter_controls(game_state, frame_millis) do
     game_state.controls
-    |> Enum.reduce(game_state, fn ({_, controls}, acc) ->
-      {fighter, projectiles} = controls |> FighterControls.apply(
-        {Map.get(game_state.fighters, controls.fighter_id), []},
-        frame_millis
-      )
+    |> Enum.reduce(game_state, fn {_, controls}, acc ->
+      {fighter, projectiles} =
+        controls
+        |> FighterControls.apply(
+          {Map.get(game_state.fighters, controls.fighter_id), []},
+          frame_millis
+        )
 
-      %GameState{acc |
-        fighters: Map.put(acc.fighters, controls.fighter_id, fighter),
-        projectiles: projectiles ++ acc.projectiles
+      %GameState{
+        acc
+        | fighters: Map.put(acc.fighters, controls.fighter_id, fighter),
+          projectiles: projectiles ++ acc.projectiles
       }
     end)
   end
 
   defp update_positions(game_state, :fighters) do
-    %GameState{game_state | fighters:
-      Enum.reduce(game_state.fighters, %{}, fn ({id, fighter}, acc) ->
-        Map.put(
-          acc,
-          id,
-          %Fighter{fighter |
-            object: fighter.object
-            |> PhysicsObject.apply_velocity()
-            |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
-          }
-        )
-      end)
+    %GameState{
+      game_state
+      | fighters:
+          Enum.reduce(game_state.fighters, %{}, fn {id, fighter}, acc ->
+            Map.put(
+              acc,
+              id,
+              %Fighter{
+                fighter
+                | object:
+                    fighter.object
+                    |> PhysicsObject.apply_velocity()
+                    |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
+              }
+            )
+          end)
     }
   end
 
   defp update_positions(game_state, :projectiles) do
-    %GameState{game_state | projectiles:
-      Enum.map(game_state.projectiles, fn (projectile) ->
-        %Projectile{projectile |
-          object: projectile.object
-            |> PhysicsObject.apply_velocity()
-            |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
-        }
-      end)
+    %GameState{
+      game_state
+      | projectiles:
+          Enum.map(game_state.projectiles, fn projectile ->
+            %Projectile{
+              projectile
+              | object:
+                  projectile.object
+                  |> PhysicsObject.apply_velocity()
+                  |> PhysicsObject.apply_edge_collisions(game_state.arena_size)
+            }
+          end)
     }
   end
 
@@ -162,42 +184,52 @@ defmodule Blast.GameState do
     {obj1_updated, obj2_updated} =
       PhysicsObject.elastic_collision(fighter1.object, fighter2.object)
 
-    %GameState{game_state |
-      fighters: %{game_state.fighters |
-        fighter1.id => %Fighter{fighter1 |
-          integrity: fighter1.integrity - 5,
-          object: obj1_updated
-        },
-        fighter2.id => %Fighter{fighter2 |
-          integrity: fighter2.integrity - 5,
-          object: obj2_updated
+    %GameState{
+      game_state
+      | fighters: %{
+          game_state.fighters
+          | fighter1.id => %Fighter{
+              fighter1
+              | integrity: fighter1.integrity - 5,
+                object: obj1_updated
+            },
+            fighter2.id => %Fighter{
+              fighter2
+              | integrity: fighter2.integrity - 5,
+                object: obj2_updated
+            }
         }
-      }
     }
   end
 
   defp collide({projectile = %Projectile{}, fighter = %Fighter{}}, game_state) do
-    {_, updated_fighter_obj} =
-      PhysicsObject.elastic_collision(projectile.object, fighter.object)
+    {_, updated_fighter_obj} = PhysicsObject.elastic_collision(projectile.object, fighter.object)
 
-    %GameState{game_state |
-      fighters: %{game_state.fighters |
-        fighter.id => %Fighter{fighter |
-          integrity: fighter.integrity - 10,
-          object: updated_fighter_obj
-        }
-      },
-      projectiles: List.delete(game_state.projectiles, projectile)
+    %GameState{
+      game_state
+      | fighters: %{
+          game_state.fighters
+          | fighter.id => %Fighter{
+              fighter
+              | integrity: fighter.integrity - 10,
+                object: updated_fighter_obj
+            }
+        },
+        projectiles: List.delete(game_state.projectiles, projectile)
     }
   end
+
   defp collide(_, game_state), do: game_state
 
   defp reap(game_state = %GameState{}, :projectiles) do
-    %GameState{game_state |
-      projectiles: game_state.projectiles
-        |> Enum.filter(fn (projectile) ->
-          projectile.object.rebounds_remaining == :unlimited || projectile.object.rebounds_remaining >= 0
-        end)
+    %GameState{
+      game_state
+      | projectiles:
+          game_state.projectiles
+          |> Enum.filter(fn projectile ->
+            projectile.object.rebounds_remaining == :unlimited ||
+              projectile.object.rebounds_remaining >= 0
+          end)
     }
   end
 

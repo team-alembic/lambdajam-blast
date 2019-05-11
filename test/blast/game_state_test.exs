@@ -20,14 +20,18 @@ defmodule Blast.GameStateTest do
 
   test "add player - idempotence", %{state: state} do
     assert state |> GameState.fighter_count() == 0
-    new_state = state
+
+    new_state =
+      state
       |> GameState.add_player("1234")
       |> GameState.add_player("1234")
+
     assert new_state |> GameState.fighter_count() == 1
   end
 
   test "only allows four players", %{state: state} do
-    new_state = state
+    new_state =
+      state
       |> GameState.add_player("1")
       |> GameState.add_player("2")
       |> GameState.add_player("3")
@@ -38,7 +42,8 @@ defmodule Blast.GameStateTest do
   end
 
   test "player initial positions and orientations", %{state: state} do
-    new_state = state
+    new_state =
+      state
       |> GameState.add_player("1")
       |> GameState.add_player("2")
       |> GameState.add_player("3")
@@ -70,7 +75,8 @@ defmodule Blast.GameStateTest do
   end
 
   test "controls work for single player", %{state: state} do
-    new_state = state
+    new_state =
+      state
       |> GameState.add_player("1")
       |> GameState.process_events(16, [{:update_fighter_controls, "1", %{:guns => :firing}}])
 
@@ -78,7 +84,8 @@ defmodule Blast.GameStateTest do
   end
 
   test "controls work for multiple players", %{state: state} do
-    new_state = state
+    new_state =
+      state
       |> GameState.add_player("1")
       |> GameState.add_player("2")
       |> GameState.process_events(16, [{:update_fighter_controls, "1", %{:guns => :firing}}])

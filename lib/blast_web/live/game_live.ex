@@ -8,7 +8,6 @@ defmodule BlastWeb.GameLive do
   alias Blast.GameObjectRenderer
   alias Blast.GameState
 
-
   def render(assigns) do
     # TODO use SVG `defs` to define shapes once and reuse with different positions,
     # transforms and rendering styles. This will drastically reduce the size of the
@@ -34,6 +33,7 @@ defmodule BlastWeb.GameLive do
     else
       :ok = unsubscribe(Blast.PubSub, "game/#{token}")
     end
+
     {:ok, assign(socket, assigns)}
   end
 
@@ -41,7 +41,11 @@ defmodule BlastWeb.GameLive do
     {:noreply, assign(socket, %{:game_state => game_state})}
   end
 
-  def handle_event("player_" <> event_type, event_data, socket = %Socket{assigns: %{token: token, active_player: player_id}}) do
+  def handle_event(
+        "player_" <> event_type,
+        event_data,
+        socket = %Socket{assigns: %{token: token, active_player: player_id}}
+      ) do
     [{pid, _}] = Registry.lookup(GameServerRegistry, token)
     handle_player_event(pid, player_id, event_type, event_data)
     {:noreply, socket}
@@ -50,13 +54,30 @@ defmodule BlastWeb.GameLive do
   def handle_event(_, _, socket), do: {:noreply, socket}
 
   defp handle_player_event(pid, player_id, event_type, event_data)
-  defp handle_player_event(pid, player_id, "keydown", "ArrowLeft"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :left})
-  defp handle_player_event(pid, player_id, "keyup", "ArrowLeft"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :not_turning})
-  defp handle_player_event(pid, player_id, "keydown", "ArrowRight"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :right})
-  defp handle_player_event(pid, player_id, "keyup", "ArrowRight"), do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :not_turning})
-  defp handle_player_event(pid, player_id, "keydown", "ArrowUp"), do: GameServer.update_fighter_controls(pid, player_id, %{:thrusters => :on})
-  defp handle_player_event(pid, player_id, "keyup", "ArrowUp"), do: GameServer.update_fighter_controls(pid, player_id, %{:thrusters => :off})
-  defp handle_player_event(pid, player_id, "keydown", " "), do: GameServer.update_fighter_controls(pid, player_id, %{:guns => :firing})
-  defp handle_player_event(pid, player_id, "keyup", " "), do: GameServer.update_fighter_controls(pid, player_id, %{:guns => :not_firing})
+
+  defp handle_player_event(pid, player_id, "keydown", "ArrowLeft"),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :left})
+
+  defp handle_player_event(pid, player_id, "keyup", "ArrowLeft"),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :not_turning})
+
+  defp handle_player_event(pid, player_id, "keydown", "ArrowRight"),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :right})
+
+  defp handle_player_event(pid, player_id, "keyup", "ArrowRight"),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:turning => :not_turning})
+
+  defp handle_player_event(pid, player_id, "keydown", "ArrowUp"),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:thrusters => :on})
+
+  defp handle_player_event(pid, player_id, "keyup", "ArrowUp"),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:thrusters => :off})
+
+  defp handle_player_event(pid, player_id, "keydown", " "),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:guns => :firing})
+
+  defp handle_player_event(pid, player_id, "keyup", " "),
+    do: GameServer.update_fighter_controls(pid, player_id, %{:guns => :not_firing})
+
   defp handle_player_event(_, _, _, _), do: :ok
 end

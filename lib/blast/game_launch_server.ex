@@ -34,12 +34,12 @@ defmodule Blast.GameLaunchServer do
   defp launch_game_server(counter) do
     token = generate_token(counter)
     name = {:via, Registry, {GameServerRegistry, token}}
-    {:ok, _} = GameServer.start_link([name: name])
+    {:ok, _} = GameServer.start_link(name: name)
     {:ok, token}
   end
 
   defp generate_token(counter) do
-    :crypto.hash(:md5 , Integer.to_string(counter))
+    :crypto.hash(:md5, Integer.to_string(counter))
     |> Base.encode16()
     |> String.slice(1..4)
   end

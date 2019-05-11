@@ -4,12 +4,12 @@ defmodule Blast.RenderHelpers do
   use Phoenix.HTML
 
   def render_polygon(%Polygon{vertices: vertices}) do
-    raw vertices |> Enum.map(fn (%{x: x, y: y}) -> "#{x} #{y}" end) |> Enum.join(", ")
+    raw(vertices |> Enum.map(fn %{x: x, y: y} -> "#{x} #{y}" end) |> Enum.join(", "))
   end
 
   def polygon_centre(polygon = %Polygon{}) do
     %{x: x, y: y} = Polygon.centre(polygon)
-    raw "#{x} #{y}"
+    raw("#{x} #{y}")
   end
 
   def polygon_centre_x(polygon = %Polygon{}) do

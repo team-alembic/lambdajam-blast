@@ -15,4 +15,3 @@ defmodule BlastWeb.GameLaunchController do
     render(conn, "game.html", token: token)
   end
 end
-

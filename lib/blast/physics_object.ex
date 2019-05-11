@@ -28,10 +28,17 @@ defmodule Blast.PhysicsObject do
   Rotate a object with angular velocity of 1.5 seconds for full rotation.
   """
   def rotate(object = %PhysicsObject{orientation: orientation}, :left, frame_millis) do
-    %PhysicsObject{object | orientation: Vector2D.rotate(orientation, -(frame_millis / 1500.0) * 360)}
+    %PhysicsObject{
+      object
+      | orientation: Vector2D.rotate(orientation, -(frame_millis / 1500.0) * 360)
+    }
   end
+
   def rotate(object = %PhysicsObject{orientation: orientation}, :right, frame_millis) do
-    %PhysicsObject{object | orientation: Vector2D.rotate(orientation, (frame_millis / 1500.0) * 360)}
+    %PhysicsObject{
+      object
+      | orientation: Vector2D.rotate(orientation, frame_millis / 1500.0 * 360)
+    }
   end
 
   @doc """
@@ -40,15 +47,17 @@ defmodule Blast.PhysicsObject do
   Uses Newtonian mechanics to calculate an updated velocity for an acceleration over `time_delta_millis`.
   """
   def apply_thrust(object, force_newtons, time_delta_millis)
-  def apply_thrust(object = %PhysicsObject{
-    velocity: velocity,
-    mass: mass,
-    orientation: orientation,
-    max_allowed_speed: max_allowed_speed
-  },
-    force_newtons,
-    time_delta_millis
-  ) do
+
+  def apply_thrust(
+        object = %PhysicsObject{
+          velocity: velocity,
+          mass: mass,
+          orientation: orientation,
+          max_allowed_speed: max_allowed_speed
+        },
+        force_newtons,
+        time_delta_millis
+      ) do
     if max_allowed_speed == :unlimited || abs(Vector2D.mag(velocity)) < max_allowed_speed do
       force_vector = Vector2D.multiply_mag(orientation, force_newtons)
       new_velocity = apply_force(velocity, mass, force_vector, time_delta_millis)
@@ -57,28 +66,32 @@ defmodule Blast.PhysicsObject do
       object
     end
   end
-  def apply_thrust(object = %PhysicsObject{}, _), do: object
 
+  def apply_thrust(object = %PhysicsObject{}, _), do: object
 
   @doc """
   Calculate new velocity when force is applied to an object for a period of time.
   """
   def apply_force(
-    velocity = %Vector2D{},
-    mass_kg,
-    force_newtons = %Vector2D{},
-    time_delta_millis
-  ) do
+        velocity = %Vector2D{},
+        mass_kg,
+        force_newtons = %Vector2D{},
+        time_delta_millis
+      ) do
     acceleration = Vector2D.mag(force_newtons) / mass_kg
+
     velocity_contribution =
-      Vector2D.multiply_mag(force_newtons, (time_delta_millis / 1000) * acceleration)
+      Vector2D.multiply_mag(force_newtons, time_delta_millis / 1000 * acceleration)
+
     Vector2D.add(velocity, velocity_contribution)
   end
 
-  def apply_velocity(object = %PhysicsObject{
-    position: position,
-    velocity: velocity
-  }) do
+  def apply_velocity(
+        object = %PhysicsObject{
+          position: position,
+          velocity: velocity
+        }
+      ) do
     %PhysicsObject{object | position: Vector2D.add(position, velocity)}
   end
 
@@ -93,34 +106,71 @@ defmodule Blast.PhysicsObject do
   #TODO: do proper collision detection with object's polygon instead of simply the position.
   """
   def apply_edge_collisions(object, arena_size)
-  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{x: x}}, arena_size) when x > arena_size do
-    apply_edge_collisions(%PhysicsObject{object |
-      velocity: object.velocity |> Vector2D.invert_x() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
-      position: %Vector2D{object.position | x: arena_size},
-      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
-    }, arena_size)
+
+  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{x: x}}, arena_size)
+      when x > arena_size do
+    apply_edge_collisions(
+      %PhysicsObject{
+        object
+        | velocity:
+            object.velocity
+            |> Vector2D.invert_x()
+            |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
+          position: %Vector2D{object.position | x: arena_size},
+          rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
+      },
+      arena_size
+    )
   end
-  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{x: x}}, arena_size) when x < 0 do
-    apply_edge_collisions(%PhysicsObject{object |
-      velocity: object.velocity |> Vector2D.invert_x() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
-      position: %Vector2D{object.position | x: 0},
-      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
-    }, arena_size)
+
+  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{x: x}}, arena_size)
+      when x < 0 do
+    apply_edge_collisions(
+      %PhysicsObject{
+        object
+        | velocity:
+            object.velocity
+            |> Vector2D.invert_x()
+            |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
+          position: %Vector2D{object.position | x: 0},
+          rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
+      },
+      arena_size
+    )
   end
-  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{y: y}}, arena_size) when y > arena_size do
-    apply_edge_collisions(%PhysicsObject{object |
-      velocity: object.velocity |> Vector2D.invert_y() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
-      position: %Vector2D{object.position | y: arena_size},
-      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
-    }, arena_size)
+
+  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{y: y}}, arena_size)
+      when y > arena_size do
+    apply_edge_collisions(
+      %PhysicsObject{
+        object
+        | velocity:
+            object.velocity
+            |> Vector2D.invert_y()
+            |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
+          position: %Vector2D{object.position | y: arena_size},
+          rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
+      },
+      arena_size
+    )
   end
-  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{y: y}}, arena_size) when y < 0 do
-    apply_edge_collisions(%PhysicsObject{object |
-      velocity: object.velocity |> Vector2D.invert_y() |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
-      position: %Vector2D{object.position | y: 0},
-      rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
-    }, arena_size)
+
+  def apply_edge_collisions(object = %PhysicsObject{position: %Vector2D{y: y}}, arena_size)
+      when y < 0 do
+    apply_edge_collisions(
+      %PhysicsObject{
+        object
+        | velocity:
+            object.velocity
+            |> Vector2D.invert_y()
+            |> Vector2D.multiply_mag(object.rebound_velocity_adjustment),
+          position: %Vector2D{object.position | y: 0},
+          rebounds_remaining: calc_rebounds_remaining(object.rebounds_remaining)
+      },
+      arena_size
+    )
   end
+
   def apply_edge_collisions(object = %PhysicsObject{}, _), do: object
 
   @doc """
@@ -136,7 +186,7 @@ defmodule Blast.PhysicsObject do
 
   # See: https://stackoverflow.com/questions/35211114/2d-elastic-ball-collision-physics
   defp compute_collision_for_one_oject(obj, other_obj) do
-    mass_part = (2 * other_obj.mass) / (obj.mass + other_obj.mass)
+    mass_part = 2 * other_obj.mass / (obj.mass + other_obj.mass)
 
     position_delta = Vector2D.sub(obj.position, other_obj.position)
 
@@ -144,13 +194,12 @@ defmodule Blast.PhysicsObject do
       obj.velocity,
       Vector2D.multiply_mag(
         position_delta,
-        mass_part * (
-          Vector2D.dot(
-            Vector2D.sub(obj.velocity, other_obj.velocity),
-            position_delta
-          ) /
-          :math.pow(Vector2D.mag(position_delta), 2)
-        )
+        mass_part *
+          (Vector2D.dot(
+             Vector2D.sub(obj.velocity, other_obj.velocity),
+             position_delta
+           ) /
+             :math.pow(Vector2D.mag(position_delta), 2))
       )
     )
   end

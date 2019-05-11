@@ -16,8 +16,8 @@ config :blast, BlastWeb.Endpoint,
   render_errors: [view: BlastWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Blast.PubSub, adapter: Phoenix.PubSub.PG2],
   live_view: [
-     signing_salt: "funtimes!"
-   ]
+    signing_salt: "funtimes!"
+  ]
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -22,17 +22,22 @@ defmodule Blast.FighterControls do
     struct(FighterControls, values)
   end
 
-  def update(controls = %FighterControls{}, values = %{turning: turning}) when turning in [:right, :left, :not_turning] do
+  def update(controls = %FighterControls{}, values = %{turning: turning})
+      when turning in [:right, :left, :not_turning] do
     update(struct(controls, values), Map.delete(values, :turning))
   end
-  def update(controls = %FighterControls{}, values = %{thrusters: thrusters}) when thrusters in [:on, :off] do
+
+  def update(controls = %FighterControls{}, values = %{thrusters: thrusters})
+      when thrusters in [:on, :off] do
     update(struct(controls, values), Map.delete(values, :thrusters))
   end
-  def update(controls = %FighterControls{}, values = %{guns: guns}) when guns in [:firing, :not_firing] do
+
+  def update(controls = %FighterControls{}, values = %{guns: guns})
+      when guns in [:firing, :not_firing] do
     update(struct(controls, values), Map.delete(values, :guns))
   end
-  def update(controls = %FighterControls{}, _), do: controls
 
+  def update(controls = %FighterControls{}, _), do: controls
 
   @doc """
   Applies the control input and returns a tuple of new structs to be incorporated into the game state.
@@ -50,10 +55,17 @@ defmodule Blast.FighterControls do
   # `current_state` is of the form `{fighter, object, projectiles}`
   defp apply_turn(current_state, controls, time_delta)
 
-  defp apply_turn({fighter, projectiles}, %FighterControls{turning: :not_turning}, _), do: {fighter, projectiles}
+  defp apply_turn({fighter, projectiles}, %FighterControls{turning: :not_turning}, _),
+    do: {fighter, projectiles}
 
   defp apply_turn({fighter, projectiles}, %FighterControls{turning: turn}, time_delta) do
-    {%Fighter{fighter | object: PhysicsObject.rotate(fighter.object, turn, time_delta)}, projectiles}
+    {
+      %Fighter{
+        fighter
+        | object: PhysicsObject.rotate(fighter.object, turn, time_delta)
+      },
+      projectiles
+    }
   end
 
   # Applies thrust to the PhysicsObject.
@@ -62,11 +74,22 @@ defmodule Blast.FighterControls do
   defp apply_thrust(current_state, controls, time_delta)
 
   # Thrusters are off, so nothing to do here.
-  defp apply_thrust({fighter, projectiles}, %FighterControls{thrusters: :off}, _), do: {fighter, projectiles}
+  defp apply_thrust({fighter, projectiles}, %FighterControls{thrusters: :off}, _),
+    do: {fighter, projectiles}
 
   # Thrusters are on, so apply fighter's engine power as thrust to the physics object.
-  defp apply_thrust({fighter = %Fighter{engine_power: newtons}, projectiles}, %FighterControls{thrusters: :on}, time_delta) do
-    {%Fighter{fighter | object: PhysicsObject.apply_thrust(fighter.object, newtons, time_delta)}, projectiles}
+  defp apply_thrust(
+         {fighter = %Fighter{engine_power: newtons}, projectiles},
+         %FighterControls{thrusters: :on},
+         time_delta
+       ) do
+    {
+      %Fighter{
+        fighter
+        | object: PhysicsObject.apply_thrust(fighter.object, newtons, time_delta)
+      },
+      projectiles
+    }
   end
 
   # Spawns projectiles when guns are fired.
@@ -74,11 +97,21 @@ defmodule Blast.FighterControls do
   defp fire_guns(current_state, controls)
 
   # Nothing to do when the guns aren't firing.
-  defp fire_guns({fighter, projectiles}, %FighterControls{guns: :not_firing}), do: {fighter, projectiles}
+  defp fire_guns({fighter, projectiles}, %FighterControls{guns: :not_firing}),
+    do: {fighter, projectiles}
 
   # Create a new projectile and deplete the figher's energy weapon charge.
-  defp fire_guns({fighter = %Fighter{charge_remaining: charge}, projectiles}, %FighterControls{guns: :firing}) when charge > 0 do
-    {%Fighter{fighter | charge_remaining: charge - 1}, [Projectile.fired_by(fighter) | projectiles]}
+  defp fire_guns({fighter = %Fighter{charge_remaining: charge}, projectiles}, %FighterControls{
+         guns: :firing
+       })
+       when charge > 0 do
+    {
+      %Fighter{
+        fighter
+        | charge_remaining: charge - 1
+      },
+      [Projectile.fired_by(fighter) | projectiles]
+    }
   end
 
   # The fighter's weapon charge has been depleted so we can't fire the guns.

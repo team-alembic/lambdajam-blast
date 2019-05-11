@@ -28,12 +28,16 @@ defmodule BlastWeb.GameController do
   defp do_get(conn, [{pid, _}], token, player_id) do
     :ok = GameServer.add_player(pid, player_id)
     game_state = GameServer.game_state(pid)
-    live_render(conn, BlastWeb.GameLive, session: %{
-      token: token,
-      active_player: player_id,
-      game_state: game_state
-    })
+
+    live_render(conn, BlastWeb.GameLive,
+      session: %{
+        token: token,
+        active_player: player_id,
+        game_state: game_state
+      }
+    )
   end
+
   defp do_get(conn, _, token, _) do
     send_resp(conn, :not_found, "Game #{token} not found")
   end
