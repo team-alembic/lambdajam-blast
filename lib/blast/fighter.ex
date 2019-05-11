@@ -17,6 +17,7 @@ defmodule Blast.Fighter do
     field :charge_remaining, pos_integer(), default: 1000
     field :integrity, pos_integer(), default: 100
     field :object, PhysicsObject.t()
+    field :colour, String.t(), default: "white"
   end
 
   alias Blast.Polygon

@@ -74,6 +74,10 @@ defmodule Blast.GameState do
   defp initial_orientation(3), do: Vector2D.unit(Vector2D.new(1, -1))
   defp initial_orientation(4), do: Vector2D.unit(Vector2D.new(-1, -1))
 
+  defp initial_colour(1), do: "blue"
+  defp initial_colour(2), do: "yellow"
+  defp initial_colour(3), do: "orange"
+  defp initial_colour(4), do: "pink"
 
   def add_player(game_state = %GameState{}, player_id) do
     num_fighters = fighter_count(game_state)
@@ -90,6 +94,7 @@ defmodule Blast.GameState do
           fighter_id,
           Fighter.new(%{
             id: fighter_id,
+            colour: initial_colour(fighter_id),
             object: PhysicsObject.new(%{
               position: initial_positition(fighter_id),
               orientation: initial_orientation(fighter_id),
