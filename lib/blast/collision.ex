@@ -25,10 +25,7 @@ defmodule Blast.Collision do
   (i.e. by changing the order of the items in the 2-element list), the list is
   sorted before insertion into the MapSet.
   """
-  def detect(objects) do
-    fighters = objects |> of_type(:fighter)
-    projectiles = objects |> of_type(:projectile)
-
+  def detect(fighters, projectiles) do
     fighter_pairs = unique_pairs(fighters)
     fighter_projectile_pairs =
       fighters
@@ -41,25 +38,17 @@ defmodule Blast.Collision do
 
     all_pairs = Enum.concat(fighter_pairs, fighter_projectile_pairs)
 
-    all_pairs |> Enum.filter(fn ({{_, _, obj1}, {_, _, obj2}}) ->
+    all_pairs |> Enum.filter(fn ({obj1, obj2}) ->
       collided?(obj1, obj2)
     end)
   end
 
   defp collided?(obj1, obj2) do
-    r1 = Polygon.bounding_sphere_radius(obj1.polygon)
-    r2 = Polygon.bounding_sphere_radius(obj2.polygon)
+    r1 = Polygon.bounding_sphere_radius(obj1.object.polygon)
+    r2 = Polygon.bounding_sphere_radius(obj2.object.polygon)
     distance_between_centres =
-      Vector2D.distance_between(obj1.position, obj2.position)
+      Vector2D.distance_between(obj1.object.position, obj2.object.position)
     distance_between_centres <= (r1 + r2)
-  end
-
-  defp of_type(objects, requested_type) do
-    objects
-    |> Enum.filter(fn ({{actual_type, _}, _}) ->
-      requested_type == actual_type
-    end)
-    |> Enum.map(fn ({{type, id}, obj}) -> {type, id, obj} end)
   end
 
   # Gets unique pairs of values.

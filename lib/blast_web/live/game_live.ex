@@ -21,7 +21,10 @@ defmodule BlastWeb.GameLive do
       phx-target="window"
      >
       <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
-      <%= for object <- Map.values(@game_state.objects) do %>
+      <%= for %{:object => object} <- Map.values(@game_state.fighters) do %>
+        <%= draw_object(object) %>
+      <% end %>
+      <%= for %{:object => object} <- @game_state.projectiles do %>
         <%= draw_object(object) %>
       <% end %>
       <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>

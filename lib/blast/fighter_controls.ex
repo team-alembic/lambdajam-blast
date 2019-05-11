@@ -39,7 +39,7 @@ defmodule Blast.FighterControls do
 
   Returns a tuple of updated state of the form {Fighter.t(), PhysicsObject.t(), list(Projectile.t())}
   """
-  def apply(controls, t = {%Fighter{}, %PhysicsObject{}, []}, time_delta) do
+  def apply(controls, t = {%Fighter{}, []}, time_delta) do
     t
     |> apply_turn(controls, time_delta)
     |> apply_thrust(controls, time_delta)
@@ -50,10 +50,10 @@ defmodule Blast.FighterControls do
   # `current_state` is of the form `{fighter, object, projectiles}`
   defp apply_turn(current_state, controls, time_delta)
 
-  defp apply_turn(t = {_, _, _}, %FighterControls{turning: :not_turning}, _), do: t
+  defp apply_turn({fighter, projectiles}, %FighterControls{turning: :not_turning}, _), do: {fighter, projectiles}
 
-  defp apply_turn(t = {_, object = %PhysicsObject{}, _}, %FighterControls{turning: turn}, time_delta) do
-    put_elem(t, 1, PhysicsObject.rotate(object, turn, time_delta))
+  defp apply_turn({fighter, projectiles}, %FighterControls{turning: turn}, time_delta) do
+    {%Fighter{fighter | object: PhysicsObject.rotate(fighter.object, turn, time_delta)}, projectiles}
   end
 
   # Applies thrust to the PhysicsObject.
@@ -62,11 +62,11 @@ defmodule Blast.FighterControls do
   defp apply_thrust(current_state, controls, time_delta)
 
   # Thrusters are off, so nothing to do here.
-  defp apply_thrust(t = {_, _, _}, %FighterControls{thrusters: :off}, _), do: t
+  defp apply_thrust({fighter, projectiles}, %FighterControls{thrusters: :off}, _), do: {fighter, projectiles}
 
   # Thrusters are on, so apply fighter's engine power as thrust to the physics object.
-  defp apply_thrust(t = {%Fighter{engine_power: newtons}, object = %PhysicsObject{}, _}, %FighterControls{thrusters: :on}, time_delta) do
-    put_elem(t, 1, PhysicsObject.apply_thrust(object, newtons, time_delta))
+  defp apply_thrust({fighter = %Fighter{engine_power: newtons}, projectiles}, %FighterControls{thrusters: :on}, time_delta) do
+    {%Fighter{fighter | object: PhysicsObject.apply_thrust(fighter.object, newtons, time_delta)}, projectiles}
   end
 
   # Spawns projectiles when guns are fired.
@@ -74,13 +74,13 @@ defmodule Blast.FighterControls do
   defp fire_guns(current_state, controls)
 
   # Nothing to do when the guns aren't firing.
-  defp fire_guns(t = {_, _, _}, %FighterControls{guns: :not_firing}), do: t
+  defp fire_guns({fighter, projectiles}, %FighterControls{guns: :not_firing}), do: {fighter, projectiles}
 
   # Create a new projectile and deplete the figher's energy weapon charge.
-  defp fire_guns({fighter = %Fighter{charge_remaining: charge}, object, projectiles}, %FighterControls{guns: :firing}) when charge > 0 do
-    {%Fighter{fighter | charge_remaining: charge - 1}, object, [Projectile.fired_by_object(object) | projectiles]}
+  defp fire_guns({fighter = %Fighter{charge_remaining: charge}, projectiles}, %FighterControls{guns: :firing}) when charge > 0 do
+    {%Fighter{fighter | charge_remaining: charge - 1}, [Projectile.fired_by(fighter) | projectiles]}
   end
 
   # The fighter's weapon charge has been depleted so we can't fire the guns.
-  defp fire_guns(t = {_, _, _}, _), do: t
+  defp fire_guns({fighter, projectiles}, _), do: {fighter, projectiles}
 end
