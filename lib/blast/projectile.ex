@@ -24,6 +24,8 @@ defmodule Blast.Projectile do
   Creates a new Projectile as if fired by a Fighter.
 
   The projectile emanates from the front (north) of `fired_by.object.polygon`.
+
+  The velocity and direction of the projectile is randomly tweaked as a neat effect.
   """
   def fired_by(fighter = %Fighter{}) do
     %PhysicsObject{
