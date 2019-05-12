@@ -12,15 +12,13 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 ## Getting started
 
-1. Visit the lobby [here](http://localost:4000/lobby).
+1. Visit the lobby [here](http://localost:4000).
 
-2. Create a new player. You won't need any credentials and the player will be bound to your browser session.
+2. Click on "Launch Game"
+
+This creates a new game on the server. You can now copy and share the game link with friends or you can join the game.
 
 Blast uses HTML Session Storage so you can have a player per browser tab that you have open. This makes it easy to test during local development.
-
-3. You should now be able to see a list of games, and you're able to create your own. If you create a game, your player then owns that game and control when it starts. Players can only join a game before it starts. Only the owner can start the game.
-
-4. Optionally, players can spectate a game. You can join a game as a spectator even when the game is in progress.
 
 ## Game controls
 
@@ -78,8 +76,7 @@ are rendered for every projectile. A circle has a positition and a size and that
 
 ### Intermediate: Implement the endgame condition
 
-The game ends when a player reaches 50 points or the game owner stops the game. The winner
-is the player with the most points.
+The game ends when a player reaches 50 points. The winner is the player with the most points.
 
 ### Intermediate: Add sound effects using the HTML5 audio element
 
@@ -129,9 +126,44 @@ This would require some book keeping to record on the Fighter the last time that
 
 The GameState should track the number of animated frames and pass that through to the FighterControls gun firing logic.
 
+### Intermediate to Advanced: Add some solid, deflecting features to the arena
+
+These will provide cover for fighters.
+
+Circles will be easiest to implement because collisions with arbitrary shapes have not yet been implemented.
+
+- update PhysicsObject to add a 'static' field. When set to true it represents an immovable object.
+- create a Blast.StaticObject module. This will have an `object` field
+- update GameState to add a `static_objects` field.
+- Implement the render protocol for Blast.StaticObject
+- Handle collisions with of fighters and projectiles with the static object. The static object itself will remain
+  unaffected by the collision.
+
+### Intermediate: multiplayer on same laptop & browser window
+
+- On the view rendered by Blast.GameLive, add a button that when clicked adds another player
+- Define an extra set of key bindings to control the additional player
+- Note: currently players are identifie by a player_id in the session; this will need need to change
+  in order to to be able identify multiple players from one browser.
+
+### Intermediate: add on-screen controls for mobile usage
+
+- On the GameLive view, add some control buttons to the screen either side of the rendered game arena.
+- Add new `handle_player_event` function heads to trap the button events.
+- Use a CSS media query to ensure that these buttons are only rendered on mobile devices in landscape mode.
+
+### Intermediate: add spectator mode (view game without creating a fighter)
+
+- add a new route in the router (something like `/spectate/#{game_id}`).
+- clicking on this link will render the game arena but will not create a new player
+- spectating people will have no FighterControls in the GameState so you will need to ensure
+  that attempting to update FighterControls will not crash for spectating players if they press a key
+
 ### Advanced: homing missile
 
-The basic vector maths is there but you'd need to calculate a force vector between the missile and the nearest fighter.
+The basic vector maths is there but you'd need to calculate a force vector between the
+missile and the nearest fighter using something like the inverse-square law to calculate
+the strength of the force vector attracting the homing missile to its target.
 
 ### Advanced: zoom the viewport to fit the combined bounding box of all players
 
