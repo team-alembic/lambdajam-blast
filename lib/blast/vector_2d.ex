@@ -49,12 +49,25 @@ defmodule Blast.Vector2D do
     %Vector2D{x: x1 + x2, y: y1 + y2}
   end
 
+  def add([]), do: raise "expected a non-empty list"
+  def add([v = %Vector2D{}]), do: v
+  def add([v1 = %Vector2D{} | [v2 = %Vector2D{} | rest]]) do
+    add([add(v1, v2) | rest])
+  end
+
   @doc """
   Subtract one vector from another.
   """
   def sub(%Vector2D{x: x1, y: y1}, %Vector2D{x: x2, y: y2}) do
     %Vector2D{x: x1 - x2, y: y1 - y2}
   end
+
+  def sub([]), do: raise "expected a non-empty list"
+  def sub([v = %Vector2D{}]), do: v
+  def sub([v1 = %Vector2D{} | [v2 = %Vector2D{} | rest]]) do
+    sub([sub(v1, v2) | rest])
+  end
+
 
   @doc """
   Multiply the magnitude of the vector by a multiplier.

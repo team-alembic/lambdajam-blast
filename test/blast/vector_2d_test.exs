@@ -51,4 +51,16 @@ defmodule Blast.Vector2DTest do
     assert_in_delta result_2.x, -1, @delta
     assert_in_delta result_2.y, 0, @delta
   end
+
+  test "addition" do
+    v1 = new(0, 1)
+    v2 = new(1, 0)
+    assert add([v1, v2]) == new(1, 1)
+  end
+
+  test "subtraction" do
+    v1 = new(0, 1)
+    v2 = new(1, 0)
+    assert sub([v1, v2]) == new(-1, 1)
+  end
 end
