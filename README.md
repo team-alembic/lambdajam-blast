@@ -30,10 +30,10 @@ Fire weapon: spacebar
 
 ## Scoring
 
-+1 point for every opponent you hit.
-+5 points for every kill.
--1 point for every hit by an opponent on you
--5 points every time you are killed
+Basic scoring is implemented but not displayed anywhere.
+
+- +5 points for every hit
+- -5 points every time you are hit
 
 ## Spawning
 
@@ -56,27 +56,83 @@ This will reduce the size of the DOM diff sent from the server to the browser.
 
 ### Basic: Scoring
 
-Implement the scoring rules above and display live scores during the game.
+Display live scores during the game.
 
-Sort the scoreboard according to high scores.
+To achieve this we need a place to put the scores. `lib/blast_web/live/game_live.ex` is where the rendering
+takes place. It renders an SVG of the game arena and all fighters and projectiles.
 
-### Basic: Recharge ammo when it runs out
+Either render the scores inside the SVG using some markup like this for example:
 
-Or, make it never run out. But right now the repeat rate is too high and it does
-eventually run out permanently!
+```
+<svg height="90" width="200">
+  <text x="10" y="20" style="fill:red;">Several lines:
+    <tspan x="10" y="45">First line.</tspan>
+    <tspan x="10" y="70">Second line.</tspan>
+  </text>
+</svg>
+```
+
+Or render the scores in one of the gutters to the left or right of the arena.
+
+#### The score data
+
+The scores can be obtained from the GameState `lib/blast/game_state.ex`.
+
+The score for each fighter is in `GameState.fighters[fighter_id].score`.
+
+Scores should be sorted highest to lowest and displayed like this:
+
+- Player 2: 530
+- Player 1: 375
+- Player 3: 210
+- Player 4: 175
+
+Where each player number comes from the `id` of the Fighter struct.
+
+### Basic: Prevent ammo from running out
+
+Find where the book keeping is done that keeps track of the ammo of the Fighter
+and change the code so that it never runs out.
+
+### Intermediate: lower the fire repeat rate
+
+The guns will fire for every animation frame in which the `FighterControls.guns` are set to `:firing`.
+
+This makes the game less fun IMHO.
+
+The FighterControls module is where user input is translate to an effect in the game.
+
+`FighterControls.fire_guns/2` is where the action happens. In order to perform rate limiting
+there will need to be a way to know when a projectile was last fired by a fighter and there
+will need to be an additional argument passed into `fire_guns` representing the current time.
+
+I suggest that time be represented as a frame count, and when the fighter last fired could be
+represented as the number of the frame when the guns were last fired. Store this on the Fighter
+module.
 
 ### Basic: Flash the fighter white when it is hit
 
 This is a classic game mechanic to indicate damage taken. Flash the fighter white for a few seconds.
 
-### Basic: Render the projectiles as solid circles (reduce amount of rendered SVG data
+This could be implemented by storing a `last_hit_time` (as the number of the animation frame when the
+hit occurred).
 
-This would improve rendering performance. Currently an SVG polygon element and its vertices
-are rendered for every projectile. A circle has a positition and a size and that's it.
+Fighters are rendered in `lib/blast/fighter_renderer.ex`. If the current animation frame is passed
+as a parameter to the renderers then the fighter colour can be set to white when the difference between
+the current animation frame number and the `last_hit_time`.
 
 ### Intermediate: Implement the endgame condition
 
-The game ends when a player reaches 50 points. The winner is the player with the most points.
+The game ends when a player reaches 50 (or whatever) points. The winner is the player with the most points.
+
+Imagine that the game terminates and announces the winner.
+
+To do this we'd need to assess the state of the game state on every server frame. The GameState module is
+here `lib/blast/game_state.ex`. Inside `GameState.process_events/3` there is a pipeline of function calls
+that apply for every server frame.
+
+I suggest adding a `check_game_over/1` function that sets a `game_over` flag on the GameState when the end
+game condition is satisfied, then update the rendering in `GameLive` to announce the winner.
 
 ### Intermediate: Add sound effects using the HTML5 audio element
 
