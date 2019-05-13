@@ -69,10 +69,10 @@ defmodule Blast.GameState do
     game_state
   end
 
-  defp initial_positition(1), do: Vector2D.new(50, 50)
-  defp initial_positition(2), do: Vector2D.new(950, 50)
-  defp initial_positition(3), do: Vector2D.new(50, 950)
-  defp initial_positition(4), do: Vector2D.new(950, 950)
+  defp initial_position(1), do: Vector2D.new(50, 50)
+  defp initial_position(2), do: Vector2D.new(950, 50)
+  defp initial_position(3), do: Vector2D.new(50, 950)
+  defp initial_position(4), do: Vector2D.new(950, 950)
 
   defp initial_orientation(1), do: Vector2D.unit(Vector2D.new(1, 1))
   defp initial_orientation(2), do: Vector2D.unit(Vector2D.new(-1, 1))
@@ -114,7 +114,7 @@ defmodule Blast.GameState do
       colour: initial_colour(fighter_id),
       object:
         PhysicsObject.new(%{
-          position: initial_positition(fighter_id),
+          position: initial_position(fighter_id),
           orientation: initial_orientation(fighter_id),
           mass: Fighter.mass(),
           polygon: Fighter.polygon(),
