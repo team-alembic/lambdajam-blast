@@ -50,10 +50,6 @@ include the full host name (not localhost!).
 
 Perhaps set the hostname as an env var before running the server?
 
-### Basic: Improve rendering performance by rounding precision of vertex data
-
-This will reduce the size of the DOM diff sent from the server to the browser.
-
 ### Basic: Scoring
 
 Display live scores during the game.
