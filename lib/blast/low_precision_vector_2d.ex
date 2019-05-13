@@ -13,7 +13,7 @@ defmodule Blast.LowPrecisionVector2D do
     field(:vector_2d, Vector2D.t())
   end
 
-  @reduced_precision_decimal_places 2
+  @reduced_precision_decimal_places 0
 
   def add(%LowPrecisionVector2D{x: _, y: _, vector_2d: vector_2d_1}, %LowPrecisionVector2D{
         x: _,
