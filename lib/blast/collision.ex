@@ -11,7 +11,7 @@ defmodule Blast.Collision do
   It's tractable because projectile-projectile collisions are not checked.
   """
 
-  alias Blast.Vector2D
+  alias Blast.LowPrecisionVector2D
   alias Blast.Polygon
 
   @doc """
@@ -30,6 +30,7 @@ defmodule Blast.Collision do
 
   defp fighter_fighter_pairs([]), do: []
   defp fighter_fighter_pairs([_]), do: []
+
   defp fighter_fighter_pairs(fighters) do
     for f1 <- fighters, f2 <- fighters, f1 !== f2 do
       [f1, f2]
@@ -40,8 +41,7 @@ defmodule Blast.Collision do
   end
 
   defp fighter_projectile_pairs(fighters, projectiles) do
-    for fighter <- fighters,
-        projectile <- projectiles, do: {projectile, fighter}
+    for fighter <- fighters, projectile <- projectiles, do: {projectile, fighter}
   end
 
   defp collided?({obj1, obj2}) do
@@ -49,7 +49,7 @@ defmodule Blast.Collision do
     r2 = Polygon.bounding_sphere_radius(obj2.object.polygon)
 
     distance_between_centres =
-      Vector2D.distance_between(obj1.object.position, obj2.object.position)
+      LowPrecisionVector2D.distance_between(obj1.object.position, obj2.object.position)
 
     distance_between_centres <= r1 + r2
   end

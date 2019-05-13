@@ -7,8 +7,8 @@ defmodule Blast.Vector2D do
   alias Blast.Vector2D
 
   typedstruct enforce: true do
-    field :x, float()
-    field :y, float()
+    field(:x, float())
+    field(:y, float())
   end
 
   @degrees_per_radian 57.2958
@@ -49,8 +49,9 @@ defmodule Blast.Vector2D do
     %Vector2D{x: x1 + x2, y: y1 + y2}
   end
 
-  def add([]), do: raise "expected a non-empty list"
+  def add([]), do: raise("expected a non-empty list")
   def add([v = %Vector2D{}]), do: v
+
   def add([v1 = %Vector2D{} | [v2 = %Vector2D{} | rest]]) do
     add([add(v1, v2) | rest])
   end
@@ -62,12 +63,12 @@ defmodule Blast.Vector2D do
     %Vector2D{x: x1 - x2, y: y1 - y2}
   end
 
-  def sub([]), do: raise "expected a non-empty list"
+  def sub([]), do: raise("expected a non-empty list")
   def sub([v = %Vector2D{}]), do: v
+
   def sub([v1 = %Vector2D{} | [v2 = %Vector2D{} | rest]]) do
     sub([sub(v1, v2) | rest])
   end
-
 
   @doc """
   Multiply the magnitude of the vector by a multiplier.
