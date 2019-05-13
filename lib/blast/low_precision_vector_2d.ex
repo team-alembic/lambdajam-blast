@@ -15,11 +15,10 @@ defmodule Blast.LowPrecisionVector2D do
 
   @reduced_precision_decimal_places 0
 
-  def add(%LowPrecisionVector2D{x: _, y: _, vector_2d: vector_2d_1}, %LowPrecisionVector2D{
-        x: _,
-        y: _,
-        vector_2d: vector_2d_2
-      }) do
+  def add(
+        %LowPrecisionVector2D{x: _, y: _, vector_2d: vector_2d_1},
+        %LowPrecisionVector2D{x: _, y: _, vector_2d: vector_2d_2}
+      ) do
     new(Vector2D.add(vector_2d_1, vector_2d_2))
   end
 
@@ -37,11 +36,10 @@ defmodule Blast.LowPrecisionVector2D do
     Vector2D.distance_between(vector_2d_1, vector_2d_2)
   end
 
-  def dot(%LowPrecisionVector2D{x: _, y: _, vector_2d: vector_2d_1}, %LowPrecisionVector2D{
-        x: _,
-        y: _,
-        vector_2d: vector_2d_2
-      }) do
+  def dot(
+        %LowPrecisionVector2D{x: _, y: _, vector_2d: vector_2d_1},
+        %LowPrecisionVector2D{x: _, y: _, vector_2d: vector_2d_2}
+      ) do
     Vector2D.dot(vector_2d_1, vector_2d_2)
   end
 
