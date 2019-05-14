@@ -3,10 +3,10 @@ defmodule Blast.Projectile do
   Contains function to create a new PhysicsObject representing a projectile fired by a weapon.
   """
 
-  alias Blast.Polygon
-  alias Blast.PhysicsObject
-  alias Blast.Vector2D
   alias Blast.Fighter
+  alias Blast.LowPrecisionVector2D
+  alias Blast.PhysicsObject
+  alias Blast.Polygon
   alias Blast.Projectile
 
   @polygon Polygon.new([{25 / 5, 0}, {40 / 5, 50 / 5}, {25 / 5, 40 / 5}, {10 / 5, 50 / 5}])
@@ -16,8 +16,8 @@ defmodule Blast.Projectile do
   use TypedStruct
 
   typedstruct enforce: true do
-    field :fired_by_fighter_id, pos_integer()
-    field :object, PhysicsObject.t()
+    field(:fired_by_fighter_id, pos_integer())
+    field(:object, PhysicsObject.t())
   end
 
   @doc """
@@ -55,29 +55,29 @@ defmodule Blast.Projectile do
   end
 
   defp calc_position(base_position, offset, firing_direction) do
-    Vector2D.add([
+    LowPrecisionVector2D.add([
       base_position,
-      Vector2D.rotate(
+      LowPrecisionVector2D.rotate(
         offset,
-        Vector2D.signed_angle_between(offset, firing_direction)
+        LowPrecisionVector2D.signed_angle_between(offset, firing_direction)
       ),
-      Vector2D.multiply_mag(Vector2D.unit_random(), 3)
+      LowPrecisionVector2D.multiply_mag(LowPrecisionVector2D.unit_random(), 3)
     ])
   end
 
   defp calc_offset(polygon) do
-    Vector2D.sub(
+    LowPrecisionVector2D.sub(
       Polygon.centre_top(polygon),
-      Vector2D.new(0, Polygon.top_y(polygon) / 2)
+      LowPrecisionVector2D.new(0, Polygon.top_y(polygon) / 2)
     )
   end
 
   defp calc_velocity(velocity, firing_direction) do
-    Vector2D.add([
+    LowPrecisionVector2D.add([
       firing_direction,
       velocity,
-      Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10),
-      Vector2D.multiply_mag(Vector2D.unit_random(), 0.5)
+      LowPrecisionVector2D.multiply_mag(LowPrecisionVector2D.unit(firing_direction), 10),
+      LowPrecisionVector2D.multiply_mag(LowPrecisionVector2D.unit_random(), 0.5)
     ])
   end
 end

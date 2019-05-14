@@ -1,10 +1,10 @@
 defmodule Blast.CollisionTest do
   use ExUnit.Case, async: true
 
-  alias Blast.Vector2D
   alias Blast.Collision
-  alias Blast.PhysicsObject
   alias Blast.Fighter
+  alias Blast.LowPrecisionVector2D
+  alias Blast.PhysicsObject
   alias Blast.Projectile
 
   test "when there are no fighters there are no collisions" do
@@ -19,8 +19,8 @@ defmodule Blast.CollisionTest do
     assert [] =
              Collision.detect(
                [
-                 fighter(%{id: 1, position: Vector2D.new(0, 0)}),
-                 fighter(%{id: 2, position: Vector2D.new(100, 100)})
+                 fighter(%{id: 1, position: LowPrecisionVector2D.new(0, 0)}),
+                 fighter(%{id: 2, position: LowPrecisionVector2D.new(100, 100)})
                ],
                []
              )
@@ -35,9 +35,9 @@ defmodule Blast.CollisionTest do
            ] =
              Collision.detect(
                [
-                 fighter(%{id: 1, position: Vector2D.new(0, 0)}),
-                 fighter(%{id: 2, position: Vector2D.new(10, 0)}),
-                 fighter(%{id: 3, position: Vector2D.new(81, 0)})
+                 fighter(%{id: 1, position: LowPrecisionVector2D.new(0, 0)}),
+                 fighter(%{id: 2, position: LowPrecisionVector2D.new(10, 0)}),
+                 fighter(%{id: 3, position: LowPrecisionVector2D.new(81, 0)})
                ],
                []
              )
@@ -60,9 +60,9 @@ defmodule Blast.CollisionTest do
            ] =
              Collision.detect(
                [
-                 fighter(%{id: 1, position: Vector2D.new(0, 0)}),
-                 fighter(%{id: 2, position: Vector2D.new(10, 0)}),
-                 fighter(%{id: 3, position: Vector2D.new(20, 0)})
+                 fighter(%{id: 1, position: LowPrecisionVector2D.new(0, 0)}),
+                 fighter(%{id: 2, position: LowPrecisionVector2D.new(10, 0)}),
+                 fighter(%{id: 3, position: LowPrecisionVector2D.new(20, 0)})
                ],
                []
              )
@@ -76,8 +76,8 @@ defmodule Blast.CollisionTest do
              }
            ] =
              Collision.detect(
-               [fighter(%{id: 1, position: Vector2D.new(0, 0)})],
-               [projectile(fighter(%{id: 2, position: Vector2D.new(5, 0)}))]
+               [fighter(%{id: 1, position: LowPrecisionVector2D.new(0, 0)})],
+               [projectile(fighter(%{id: 2, position: LowPrecisionVector2D.new(5, 0)}))]
              )
   end
 
@@ -88,9 +88,9 @@ defmodule Blast.CollisionTest do
         PhysicsObject.new(
           %{
             polygon: Fighter.polygon(),
-            velocity: Vector2D.new(0, 0),
-            orientation: Vector2D.new(0, 0),
-            position: Vector2D.new(0, 0),
+            velocity: LowPrecisionVector2D.new(0, 0),
+            orientation: LowPrecisionVector2D.new(0, 0),
+            position: LowPrecisionVector2D.new(0, 0),
             max_allowed_speed: 100,
             mass: 1000
           }

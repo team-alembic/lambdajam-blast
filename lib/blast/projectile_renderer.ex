@@ -1,9 +1,6 @@
 defimpl Blast.GameObjectRenderer, for: Blast.Projectile do
   alias Blast.PhysicsObject
   alias Blast.Projectile
-  alias Blast.Vector2D
-
-  import Blast.RenderHelpers
 
   require Phoenix.LiveView
   import Phoenix.LiveView, only: :macros

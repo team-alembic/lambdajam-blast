@@ -4,22 +4,22 @@ defmodule Blast.GameState do
   of the game based on previous state + inputs.
   """
 
+  alias Blast.Collision
   alias Blast.Fighter
   alias Blast.FighterControls
-  alias Blast.Projectile
-  alias Blast.PhysicsObject
-  alias Blast.Vector2D
-  alias Blast.Collision
   alias Blast.GameState
+  alias Blast.LowPrecisionVector2D
+  alias Blast.PhysicsObject
+  alias Blast.Projectile
 
   use TypedStruct
 
   typedstruct enforce: true do
-    field :arena_size, pos_integer(), default: 1000
-    field :max_players, pos_integer(), default: 4
-    field :controls, %{String.t() => FighterControls.t()}, default: %{}
-    field :fighters, %{integer() => Fighter.t()}, default: %{}
-    field :projectiles, %{integer() => Projectile.t()}, default: []
+    field(:arena_size, pos_integer(), default: 1000)
+    field(:max_players, pos_integer(), default: 4)
+    field(:controls, %{String.t() => FighterControls.t()}, default: %{})
+    field(:fighters, %{integer() => Fighter.t()}, default: %{})
+    field(:projectiles, %{integer() => Projectile.t()}, default: [])
   end
 
   def new() do
@@ -69,15 +69,15 @@ defmodule Blast.GameState do
     game_state
   end
 
-  defp initial_positition(1), do: Vector2D.new(50, 50)
-  defp initial_positition(2), do: Vector2D.new(950, 50)
-  defp initial_positition(3), do: Vector2D.new(50, 950)
-  defp initial_positition(4), do: Vector2D.new(950, 950)
+  defp initial_position(1), do: LowPrecisionVector2D.new(50, 50)
+  defp initial_position(2), do: LowPrecisionVector2D.new(950, 50)
+  defp initial_position(3), do: LowPrecisionVector2D.new(50, 950)
+  defp initial_position(4), do: LowPrecisionVector2D.new(950, 950)
 
-  defp initial_orientation(1), do: Vector2D.unit(Vector2D.new(1, 1))
-  defp initial_orientation(2), do: Vector2D.unit(Vector2D.new(-1, 1))
-  defp initial_orientation(3), do: Vector2D.unit(Vector2D.new(1, -1))
-  defp initial_orientation(4), do: Vector2D.unit(Vector2D.new(-1, -1))
+  defp initial_orientation(1), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(1, 1))
+  defp initial_orientation(2), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(-1, 1))
+  defp initial_orientation(3), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(1, -1))
+  defp initial_orientation(4), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(-1, -1))
 
   defp initial_colour(1), do: "blue"
   defp initial_colour(2), do: "yellow"
@@ -86,13 +86,13 @@ defmodule Blast.GameState do
 
   defp add_player(game_state = %GameState{}, player_id) do
     num_fighters = fighter_count(game_state)
+
     if can_add_player?(game_state, player_id) do
       fighter_id = num_fighters + 1
+
       update(game_state, %{
-        controls:
-          Map.put_new(game_state.controls, player_id, make_controls(fighter_id)),
-        fighters:
-          Map.put_new(game_state.fighters, fighter_id, make_fighter(fighter_id))
+        controls: Map.put_new(game_state.controls, player_id, make_controls(fighter_id)),
+        fighters: Map.put_new(game_state.fighters, fighter_id, make_fighter(fighter_id))
       })
     else
       game_state
@@ -114,7 +114,7 @@ defmodule Blast.GameState do
       colour: initial_colour(fighter_id),
       object:
         PhysicsObject.new(%{
-          position: initial_positition(fighter_id),
+          position: initial_position(fighter_id),
           orientation: initial_orientation(fighter_id),
           mass: Fighter.mass(),
           polygon: Fighter.polygon(),
@@ -182,16 +182,19 @@ defmodule Blast.GameState do
       PhysicsObject.elastic_collision(fighter1.object, fighter2.object)
 
     update(game_state, %{
-      fighters: Map.merge(game_state.fighters, %{
-        fighter1.id => Fighter.update(fighter1, %{
-          integrity: fighter1.integrity - 5,
-          object: obj1_updated
-        }),
-        fighter2.id => Fighter.update(fighter2, %{
-          integrity: fighter2.integrity - 5,
-          object: obj2_updated
+      fighters:
+        Map.merge(game_state.fighters, %{
+          fighter1.id =>
+            Fighter.update(fighter1, %{
+              integrity: fighter1.integrity - 5,
+              object: obj1_updated
+            }),
+          fighter2.id =>
+            Fighter.update(fighter2, %{
+              integrity: fighter2.integrity - 5,
+              object: obj2_updated
+            })
         })
-      })
     })
   end
 
@@ -201,16 +204,19 @@ defmodule Blast.GameState do
     firing_fighter = Map.get(game_state.fighters, projectile.fired_by_fighter_id)
 
     update(game_state, %{
-      fighters: Map.merge(game_state.fighters, %{
-        fighter.id => Fighter.update(fighter, %{
-          integrity: fighter.integrity - 10,
-          object: updated_fighter_obj,
-          score: fighter.score - 10
+      fighters:
+        Map.merge(game_state.fighters, %{
+          fighter.id =>
+            Fighter.update(fighter, %{
+              integrity: fighter.integrity - 10,
+              object: updated_fighter_obj,
+              score: fighter.score - 10
+            }),
+          firing_fighter.id =>
+            Fighter.update(firing_fighter, %{
+              score: firing_fighter.score + 10
+            })
         }),
-        firing_fighter.id => Fighter.update(firing_fighter, %{
-          score: firing_fighter.score + 10,
-        })
-      }),
       projectiles: List.delete(game_state.projectiles, projectile)
     })
   end

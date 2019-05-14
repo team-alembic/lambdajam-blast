@@ -1,4 +1,5 @@
 defimpl Blast.GameObjectRenderer, for: Blast.Fighter do
+  alias Blast.LowPrecisionVector2D
   alias Blast.PhysicsObject
   alias Blast.Fighter
   alias Blast.Vector2D
@@ -21,7 +22,7 @@ defimpl Blast.GameObjectRenderer, for: Blast.Fighter do
       fill='<%= colour %>'
       transform='
         translate(<%= position.x - polygon_centre_x(polygon) %>, <%= position.y - polygon_centre_y(polygon) %>)
-        rotate(<%= Vector2D.signed_angle_between(Vector2D.north(), Vector2D.unit(orientation)) %> <%= polygon_centre(polygon) %>)
+        rotate(<%= LowPrecisionVector2D.signed_angle_between(LowPrecisionVector2D.new(Vector2D.north()), LowPrecisionVector2D.unit(orientation)) %> <%= polygon_centre(polygon) %>)
       '
     />
     """
