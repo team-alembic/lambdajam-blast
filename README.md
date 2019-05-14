@@ -12,7 +12,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 ## Getting started
 
-1. Visit the lobby [here](http://localost:4000).
+1. Visit the lobby [here](http://localhost:4000).
 
 2. Click on "Launch Game"
 
