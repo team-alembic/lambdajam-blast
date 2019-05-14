@@ -11,7 +11,7 @@ defmodule Blast.Collision do
   It's tractable because projectile-projectile collisions are not checked.
   """
 
-  alias Blast.LowPrecisionVector2D
+  alias Blast.Vector2D
   alias Blast.Polygon
 
   @doc """
@@ -49,7 +49,7 @@ defmodule Blast.Collision do
     r2 = Polygon.bounding_sphere_radius(obj2.object.polygon)
 
     distance_between_centres =
-      LowPrecisionVector2D.distance_between(obj1.object.position, obj2.object.position)
+      Vector2D.distance_between(obj1.object.position, obj2.object.position)
 
     distance_between_centres <= r1 + r2
   end

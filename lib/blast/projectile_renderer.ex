@@ -13,8 +13,8 @@ defimpl Blast.GameObjectRenderer, for: Blast.Projectile do
       ) do
     ~L"""
     <circle
-      cx="<%= position.x %>"
-      cy="<%= position.y %>"
+      cx="<%= round(position.x) %>"
+      cy="<%= round(position.y) %>"
       r="3"
       opacity='1'
       fill='yellow'

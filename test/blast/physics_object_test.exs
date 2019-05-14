@@ -1,7 +1,7 @@
 defmodule Blast.PhysicsTest do
   use ExUnit.Case, async: true
 
-  alias Blast.LowPrecisionVector2D
+  alias Blast.Vector2D
   alias Blast.PhysicsObject
   alias Blast.Polygon
 
@@ -10,13 +10,13 @@ defmodule Blast.PhysicsTest do
      %{
        object: %PhysicsObject{
          polygon: Polygon.new([{0, 0}, {1, 1}, {0, 1}]),
-         velocity: LowPrecisionVector2D.new(0, 0),
+         velocity: Vector2D.new(0, 0),
          max_allowed_speed: 100,
-         orientation: LowPrecisionVector2D.new(0, 0),
-         position: LowPrecisionVector2D.new(0, 0),
+         orientation: Vector2D.new(0, 0),
+         position: Vector2D.new(0, 0),
          mass: 1000
        },
-       force: LowPrecisionVector2D.new(0, 0),
+       force: Vector2D.new(0, 0),
        time_delta_millis: 1000
      }}
   end

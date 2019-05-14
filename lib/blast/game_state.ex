@@ -8,18 +8,18 @@ defmodule Blast.GameState do
   alias Blast.Fighter
   alias Blast.FighterControls
   alias Blast.GameState
-  alias Blast.LowPrecisionVector2D
   alias Blast.PhysicsObject
   alias Blast.Projectile
+  alias Blast.Vector2D
 
   use TypedStruct
 
   typedstruct enforce: true do
-    field(:arena_size, pos_integer(), default: 1000)
-    field(:max_players, pos_integer(), default: 4)
-    field(:controls, %{String.t() => FighterControls.t()}, default: %{})
-    field(:fighters, %{integer() => Fighter.t()}, default: %{})
-    field(:projectiles, %{integer() => Projectile.t()}, default: [])
+    field :arena_size, pos_integer(), default: 1000
+    field :max_players, pos_integer(), default: 4
+    field :controls, %{String.t() => FighterControls.t()}, default: %{}
+    field :fighters, %{integer() => Fighter.t()}, default: %{}
+    field :projectiles, %{integer() => Projectile.t()}, default: []
   end
 
   def new() do
@@ -69,20 +69,20 @@ defmodule Blast.GameState do
     game_state
   end
 
-  defp initial_position(1), do: LowPrecisionVector2D.new(50, 50)
-  defp initial_position(2), do: LowPrecisionVector2D.new(950, 50)
-  defp initial_position(3), do: LowPrecisionVector2D.new(50, 950)
-  defp initial_position(4), do: LowPrecisionVector2D.new(950, 950)
-
-  defp initial_orientation(1), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(1, 1))
-  defp initial_orientation(2), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(-1, 1))
-  defp initial_orientation(3), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(1, -1))
-  defp initial_orientation(4), do: LowPrecisionVector2D.unit(LowPrecisionVector2D.new(-1, -1))
+  defp initial_orientation(1), do: Vector2D.unit(Vector2D.new(1, 1))
+  defp initial_orientation(2), do: Vector2D.unit(Vector2D.new(-1, 1))
+  defp initial_orientation(3), do: Vector2D.unit(Vector2D.new(1, -1))
+  defp initial_orientation(4), do: Vector2D.unit(Vector2D.new(-1, -1))
 
   defp initial_colour(1), do: "blue"
   defp initial_colour(2), do: "yellow"
   defp initial_colour(3), do: "orange"
   defp initial_colour(4), do: "pink"
+
+  defp initial_position(1), do: Vector2D.new(50, 50)
+  defp initial_position(2), do: Vector2D.new(950, 50)
+  defp initial_position(3), do: Vector2D.new(50, 950)
+  defp initial_position(4), do: Vector2D.new(950, 950)
 
   defp add_player(game_state = %GameState{}, player_id) do
     num_fighters = fighter_count(game_state)

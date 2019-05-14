@@ -9,7 +9,7 @@ defmodule Blast.RenderHelpers do
   def render_polygon(%Polygon{vertices: vertices}) do
     raw(
       Enum.map(vertices, fn %{x: x, y: y} ->
-        "#{x} #{y}"
+        "#{round(x)} #{round(y)}"
       end)
       |> Enum.join(", ")
     )
@@ -17,16 +17,16 @@ defmodule Blast.RenderHelpers do
 
   def polygon_centre(polygon = %Polygon{}) do
     %{x: x, y: y} = Polygon.centre(polygon)
-    raw("#{x} #{y}")
+    raw("#{round(x)} #{round(y)}")
   end
 
   def polygon_centre_x(polygon = %Polygon{}) do
     %{x: x} = Polygon.centre(polygon)
-    x
+    round(x)
   end
 
   def polygon_centre_y(polygon = %Polygon{}) do
     %{y: y} = Polygon.centre(polygon)
-    y
+    round(y)
   end
 end

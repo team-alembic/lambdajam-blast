@@ -5,20 +5,20 @@ defmodule Blast.Polygon do
   The game engine assumes the polygon is specified with the "front" pointing upwards and
   in the same coordinate system as the world coordinates. Top-left is 0,0.
   """
-  alias Blast.LowPrecisionVector2D
+  alias Blast.Vector2D
   alias Blast.Polygon
 
   use TypedStruct
 
   typedstruct enforce: true do
-    field(:vertices, list(LowPrecisionVector2D.t()))
+    field(:vertices, list(Vector2D.t()))
   end
 
   def new(points) when is_list(points) do
-    %Polygon{vertices: points |> Enum.map(fn {x, y} -> LowPrecisionVector2D.new(x, y) end)}
+    %Polygon{vertices: points |> Enum.map(fn {x, y} -> Vector2D.new(x, y) end)}
   end
 
-  # Returns the centre of the polygon as a LowPrecisionVector2D
+  # Returns the centre of the polygon as a Vector2D
   def centre(%Polygon{vertices: vertices}) do
     count = length(vertices)
 
@@ -28,7 +28,7 @@ defmodule Blast.Polygon do
         {sumX + x, sumY + y}
       end)
 
-    LowPrecisionVector2D.new(totalX / count, totalY / count)
+    Vector2D.new(totalX / count, totalY / count)
   end
 
   @doc """
@@ -45,7 +45,7 @@ defmodule Blast.Polygon do
   """
   def centre_top(polygon = %Polygon{}) do
     %{x: x} = centre(polygon)
-    LowPrecisionVector2D.new(x, top_y(polygon))
+    Vector2D.new(x, top_y(polygon))
   end
 
   @doc """
@@ -53,7 +53,7 @@ defmodule Blast.Polygon do
   """
   def bounding_sphere_radius(polygon = %Polygon{vertices: vertices}) do
     c = centre(polygon)
-    biggest_v = Enum.max_by(vertices, fn v -> LowPrecisionVector2D.distance_between(v, c) end)
-    LowPrecisionVector2D.distance_between(biggest_v, c)
+    biggest_v = Enum.max_by(vertices, fn v -> Vector2D.distance_between(v, c) end)
+    Vector2D.distance_between(biggest_v, c)
   end
 end

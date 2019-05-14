@@ -4,7 +4,7 @@ defmodule Blast.Projectile do
   """
 
   alias Blast.Fighter
-  alias Blast.LowPrecisionVector2D
+  alias Blast.Vector2D
   alias Blast.PhysicsObject
   alias Blast.Polygon
   alias Blast.Projectile
@@ -16,8 +16,8 @@ defmodule Blast.Projectile do
   use TypedStruct
 
   typedstruct enforce: true do
-    field(:fired_by_fighter_id, pos_integer())
-    field(:object, PhysicsObject.t())
+    field :fired_by_fighter_id, pos_integer()
+    field :object, PhysicsObject.t()
   end
 
   @doc """
@@ -55,29 +55,29 @@ defmodule Blast.Projectile do
   end
 
   defp calc_position(base_position, offset, firing_direction) do
-    LowPrecisionVector2D.add([
+    Vector2D.add([
       base_position,
-      LowPrecisionVector2D.rotate(
+      Vector2D.rotate(
         offset,
-        LowPrecisionVector2D.signed_angle_between(offset, firing_direction)
+        Vector2D.signed_angle_between(offset, firing_direction)
       ),
-      LowPrecisionVector2D.multiply_mag(LowPrecisionVector2D.unit_random(), 3)
+      Vector2D.multiply_mag(Vector2D.unit_random(), 3)
     ])
   end
 
   defp calc_offset(polygon) do
-    LowPrecisionVector2D.sub(
+    Vector2D.sub(
       Polygon.centre_top(polygon),
-      LowPrecisionVector2D.new(0, Polygon.top_y(polygon) / 2)
+      Vector2D.new(0, Polygon.top_y(polygon) / 2)
     )
   end
 
   defp calc_velocity(velocity, firing_direction) do
-    LowPrecisionVector2D.add([
+    Vector2D.add([
       firing_direction,
       velocity,
-      LowPrecisionVector2D.multiply_mag(LowPrecisionVector2D.unit(firing_direction), 10),
-      LowPrecisionVector2D.multiply_mag(LowPrecisionVector2D.unit_random(), 0.5)
+      Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10),
+      Vector2D.multiply_mag(Vector2D.unit_random(), 0.5)
     ])
   end
 end

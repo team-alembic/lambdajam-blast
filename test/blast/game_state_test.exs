@@ -2,7 +2,7 @@ defmodule Blast.GameStateTest do
   use ExUnit.Case, async: true
 
   alias Blast.GameState
-  alias Blast.LowPrecisionVector2D
+  alias Blast.Vector2D
 
   setup do
     [state: GameState.new()]
@@ -62,26 +62,26 @@ defmodule Blast.GameStateTest do
       ])
 
     # Fighter 1 is top-left pointing towards the centre (offset 50, 50)
-    p1_expected_orientation = LowPrecisionVector2D.new(1, 1) |> LowPrecisionVector2D.unit()
-    p1_expected_position = LowPrecisionVector2D.new(50, 50)
+    p1_expected_orientation = Vector2D.new(1, 1) |> Vector2D.unit()
+    p1_expected_position = Vector2D.new(50, 50)
     assert new_state.fighters[1].object.position == p1_expected_position
     assert new_state.fighters[1].object.orientation == p1_expected_orientation
 
     # Fighter 2 is top-right pointing towards the centre
-    p2_expected_orientation = LowPrecisionVector2D.new(-1, 1) |> LowPrecisionVector2D.unit()
-    p2_expected_position = LowPrecisionVector2D.new(950, 50)
+    p2_expected_orientation = Vector2D.new(-1, 1) |> Vector2D.unit()
+    p2_expected_position = Vector2D.new(950, 50)
     assert new_state.fighters[2].object.position == p2_expected_position
     assert new_state.fighters[2].object.orientation == p2_expected_orientation
 
     # Fighter 3 is bottom-left pointing towards the centre
-    p3_expected_orientation = LowPrecisionVector2D.new(1, -1) |> LowPrecisionVector2D.unit()
-    p3_expected_position = LowPrecisionVector2D.new(50, 950)
+    p3_expected_orientation = Vector2D.new(1, -1) |> Vector2D.unit()
+    p3_expected_position = Vector2D.new(50, 950)
     assert new_state.fighters[3].object.position == p3_expected_position
     assert new_state.fighters[3].object.orientation == p3_expected_orientation
 
     # Fighter 4 is bottom-right pointing towards the centre
-    p4_expected_orientation = LowPrecisionVector2D.new(-1, -1) |> LowPrecisionVector2D.unit()
-    p4_expected_position = LowPrecisionVector2D.new(950, 950)
+    p4_expected_orientation = Vector2D.new(-1, -1) |> Vector2D.unit()
+    p4_expected_position = Vector2D.new(950, 950)
     assert new_state.fighters[4].object.position == p4_expected_position
     assert new_state.fighters[4].object.orientation == p4_expected_orientation
   end

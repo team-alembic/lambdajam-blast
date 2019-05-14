@@ -1,5 +1,4 @@
 defimpl Blast.GameObjectRenderer, for: Blast.Fighter do
-  alias Blast.LowPrecisionVector2D
   alias Blast.PhysicsObject
   alias Blast.Fighter
   alias Blast.Vector2D
@@ -10,6 +9,7 @@ defimpl Blast.GameObjectRenderer, for: Blast.Fighter do
   import Phoenix.LiveView, only: :macros
 
   @impl true
+  @spec render_object(Blast.Fighter.t()) :: Phoenix.LiveView.Rendered.t()
   def render_object(
         assigns = %Fighter{
           colour: colour,
@@ -21,8 +21,9 @@ defimpl Blast.GameObjectRenderer, for: Blast.Fighter do
       points="<%= render_polygon(polygon) %>"
       fill='<%= colour %>'
       transform='
-        translate(<%= position.x - polygon_centre_x(polygon) %>, <%= position.y - polygon_centre_y(polygon) %>)
-        rotate(<%= LowPrecisionVector2D.signed_angle_between(LowPrecisionVector2D.new(Vector2D.north()), LowPrecisionVector2D.unit(orientation)) %> <%= polygon_centre(polygon) %>)
+        translate(<%= round(position.x - polygon_centre_x(polygon)) %>, <%= round(position.y - polygon_centre_y(polygon)) %>)
+        rotate(<%= round(Vector2D.signed_angle_between(Vector2D.north(), Vector2D.unit(orientation))) %>
+        <%= polygon_centre(polygon) %>)
       '
     />
     """
