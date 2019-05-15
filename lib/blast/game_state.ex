@@ -11,6 +11,7 @@ defmodule Blast.GameState do
   alias Blast.PhysicsObject
   alias Blast.Projectile
   alias Blast.Vector2D
+  alias Blast.SoundEffect
 
   use TypedStruct
 
@@ -20,13 +21,16 @@ defmodule Blast.GameState do
     field :controls, %{String.t() => FighterControls.t()}, default: %{}
     field :fighters, %{integer() => Fighter.t()}, default: %{}
     field :projectiles, %{integer() => Projectile.t()}, default: []
+    field :sounds, list(), default: []
+    field :frame_number, integer(), default: 0
+    field :next_sound_id, integer(), default: 0
   end
 
   def new() do
     %GameState{}
   end
 
-  def fighter(%GameState{fighters: fighters}, player_id) do
+  def fighter(%GameState{fighters: fighters}, player_id) when is_binary(player_id) do
     fighters[player_id]
   end
 
@@ -43,6 +47,7 @@ defmodule Blast.GameState do
     |> update_positions(:projectiles)
     |> apply_collisions()
     |> reap(:projectiles)
+    |> inc_frame_number()
   end
 
   # Processes one user-generated event and returns a new GameState.
@@ -133,9 +138,22 @@ defmodule Blast.GameState do
           frame_millis
         )
 
+      sounds =
+        projectiles
+        |> Enum.with_index()
+        |> Enum.map(fn {_, index} ->
+          %SoundEffect{
+            id: game_state.next_sound_id + index,
+            file: "/sfx/fighter-shoot.wav",
+            starting_frame: game_state.frame_number
+          }
+        end)
+
       update(acc, %{
         fighters: Map.put(acc.fighters, controls.fighter_id, fighter),
-        projectiles: projectiles ++ acc.projectiles
+        projectiles: projectiles ++ acc.projectiles,
+        sounds: sounds,
+        next_sound_id: game_state.next_sound_id + length(sounds)
       })
     end)
   end
@@ -232,6 +250,10 @@ defmodule Blast.GameState do
             projectile.object.rebounds_remaining >= 0
         end)
     })
+  end
+
+  def inc_frame_number(game_state = %GameState{frame_number: frame_number}) do
+    %GameState{game_state | frame_number: frame_number}
   end
 
   def count_projectiles(game_state) do

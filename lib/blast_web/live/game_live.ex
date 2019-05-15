@@ -5,8 +5,9 @@ defmodule BlastWeb.GameLive do
   alias Phoenix.LiveView.Socket
 
   alias Blast.GameServer
-  alias Blast.GameObjectRenderer
   alias Blast.GameState
+  alias Blast.GameObjectRenderer
+  alias Blast.SoundEffectRenderer
 
   def render(assigns) do
     # TODO use SVG `defs` to define shapes once and reuse with different positions,
@@ -24,6 +25,9 @@ defmodule BlastWeb.GameLive do
       <% end %>
       <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
     </svg>
+    <%= for sound_effect <- @game_state.sounds do %>
+      <%= SoundEffectRenderer.render(sound_effect) %>
+    <% end %>
     """
   end
 
