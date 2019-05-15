@@ -25,9 +25,11 @@ defmodule BlastWeb.GameLive do
       <% end %>
       <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
     </svg>
-    <%= for sound_effect <- @game_state.sounds do %>
-      <%= SoundEffectRenderer.render(sound_effect) %>
-    <% end %>
+    <div style="display: hidden;" id="sound-fx">
+      <%= for sound <- @game_state.sounds do %>
+        <%= SoundEffectRenderer.render(sound) %>
+      <% end %>
+    </div>
     """
   end
 

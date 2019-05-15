@@ -42,11 +42,13 @@ defmodule Blast.GameState do
     |> Enum.reduce(game_state, fn event, acc ->
       process_event(acc, event)
     end)
+    # |> clear_sounds()
     |> apply_fighter_controls(frame_millis)
     |> update_positions(:fighters)
     |> update_positions(:projectiles)
     |> apply_collisions()
     |> reap(:projectiles)
+    |> reap(:sounds, frame_millis)
     |> inc_frame_number()
   end
 
@@ -138,22 +140,18 @@ defmodule Blast.GameState do
           frame_millis
         )
 
-      sounds =
+      new_sounds =
         projectiles
         |> Enum.with_index()
         |> Enum.map(fn {_, index} ->
-          %SoundEffect{
-            id: game_state.next_sound_id + index,
-            file: "/sfx/fighter-shoot.wav",
-            starting_frame: game_state.frame_number
-          }
+          SoundEffect.new(:shoot, game_state.next_sound_id + index, game_state.frame_number)
         end)
 
       update(acc, %{
         fighters: Map.put(acc.fighters, controls.fighter_id, fighter),
         projectiles: projectiles ++ acc.projectiles,
-        sounds: sounds,
-        next_sound_id: game_state.next_sound_id + length(sounds)
+        sounds: game_state.sounds ++ new_sounds,
+        next_sound_id: game_state.next_sound_id + length(new_sounds)
       })
     end)
   end
@@ -252,8 +250,16 @@ defmodule Blast.GameState do
     })
   end
 
+  defp reap(game_state = %GameState{}, :sounds, frame_millis) do
+    update(game_state, %{
+      sounds:
+        game_state.sounds
+        |> Enum.filter(&(&1.starting_frame + 5000 / frame_millis >= game_state.frame_number))
+    })
+  end
+
   def inc_frame_number(game_state = %GameState{frame_number: frame_number}) do
-    %GameState{game_state | frame_number: frame_number}
+    %GameState{game_state | frame_number: frame_number + 1}
   end
 
   def count_projectiles(game_state) do
@@ -267,4 +273,6 @@ defmodule Blast.GameState do
   defp update(game_state = %GameState{}, values = %{}) do
     struct(game_state, values)
   end
+
+  defp clear_sounds(game_state), do: %GameState{game_state | sounds: []}
 end

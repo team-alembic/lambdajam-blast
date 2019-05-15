@@ -11,6 +11,10 @@ defmodule BlastWeb.Router do
     plug Phoenix.LiveView.Flash
   end
 
+  pipeline :game do
+    plug :put_layout, {BlastWeb.LayoutView, :game}
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -20,12 +24,10 @@ defmodule BlastWeb.Router do
 
     get "/", GameLaunchController, :index
     post "/", GameLaunchController, :create
-
-    match :get, "/game/:game_id", GameController, :join_game
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", BlastWeb do
-  #   pipe_through :api
-  # end
+  scope "/game", BlastWeb do
+    pipe_through [:browser, :game]
+    match :get, "/:game_id", GameController, :join_game
+  end
 end

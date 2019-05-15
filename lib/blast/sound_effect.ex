@@ -15,4 +15,11 @@ defmodule Blast.SoundEffect do
     field :file, String.t()
     field :starting_frame, integer()
   end
+
+  alias Blast.SoundEffect
+
+  @spec new(atom(), integer(), integer()) :: Blast.SoundEffect.t()
+  def new(:shoot, id, starting_frame) when is_integer(id) and is_integer(starting_frame) do
+    %SoundEffect{id: id, starting_frame: starting_frame, file: "/sfx/fighter-shoot.wav"}
+  end
 end
