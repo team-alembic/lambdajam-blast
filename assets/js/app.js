@@ -20,6 +20,10 @@ import LiveSocket from "phoenix_live_view";
 let liveSocket = new LiveSocket("/live");
 liveSocket.connect();
 
+const ClipboardJS = require("clipboard");
+
+window.ClipboardJS = ClipboardJS;
+
 // The following is a hack to play audio.
 // We observe DOM element creation events underneath the element with ID "sound-fx".
 // Those nodes have attributes that describe the audio file to play.

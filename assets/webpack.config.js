@@ -13,10 +13,10 @@ module.exports = (env, options) => ({
     ]
   },
   entry: {
-    "./js/app.js": ["./js/app.js"].concat(glob.sync("./vendor/**/*.js"))
+    "./app.js": ["./js/app.js"].concat(glob.sync("./vendor/**/*.js"))
   },
   output: {
-    filename: "app.js",
+    filename: "[name]",
     path: path.resolve(__dirname, "../priv/static/js")
   },
   module: {
@@ -24,6 +24,10 @@ module.exports = (env, options) => ({
       {
         test: /\.js$/,
         exclude: /node_modules/,
+        include: [
+          __dirname,
+          path.resolve(__dirname, "node_modules/clipboard/src")
+        ],
         use: {
           loader: "babel-loader"
         }

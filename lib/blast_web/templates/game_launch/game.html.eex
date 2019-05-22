@@ -1,11 +1,12 @@
 <div class="page join-page">
-  <script src="<%= Routes.static_path(@conn, "/js/clipboard.js") %>" ></script>
-  <script>
-    new ClipboardJS('.copy-link');
+  <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  <script type="text/javascript">
+    console.log(window);
+    new window.ClipboardJS('.copy-link');
   </script>
   <div class="dashboard">
     <div>
-      <a class="button copy-link" data-clipboard-text="<%= Routes.game_path(@conn, :join_game, @game_id) %>">Copy link 📋</a>
+      <a class="button copy-link" data-clipboard-text="<%= "#{Plug.Conn.get_req_header(@conn, "Host")}#{Routes.game_path(@conn, :join_game, @game_id)}" %>">Copy link 📋</a>
       <a class="button" href="<%= Routes.game_path(@conn, :join_game, @game_id) %>">Join Game 🎮</a>
     </div>
     <p>
