@@ -2,6 +2,7 @@ defmodule BlastWeb.Router do
   use BlastWeb, :router
 
   pipeline :browser do
+    plug CORSPlug, origin: "*"
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash

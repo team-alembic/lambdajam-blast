@@ -45,7 +45,8 @@ defmodule Blast.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
       {:uuid, "~> 1.1"},
-      {:typed_struct, "~> 0.1.4"}
+      {:typed_struct, "~> 0.1.4"},
+      {:cors_plug, "~> 2.0"}
     ]
   end
 
