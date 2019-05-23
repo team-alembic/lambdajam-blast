@@ -15,7 +15,7 @@ defmodule Blast.Fighter do
     field :id, pos_integer()
     field :engine_power, pos_integer(), default: 80
     field :charge_remaining, pos_integer(), default: 1000
-    field :integrity, pos_integer(), default: 100
+    field :integrity, float(), default: 100.0
     field :object, PhysicsObject.t()
     field :colour, String.t(), default: "white"
     field :score, integer(), default: 0

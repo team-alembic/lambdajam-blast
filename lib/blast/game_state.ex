@@ -270,4 +270,8 @@ defmodule Blast.GameState do
   defp update(game_state = %GameState{}, values = %{}) do
     struct(game_state, values)
   end
+
+  def fighters_in_order(game_state = %GameState{fighters: fighters}) do
+    fighters |> Map.values() |> Enum.sort_by(& &1.id)
+  end
 end

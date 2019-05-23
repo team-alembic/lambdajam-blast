@@ -14,21 +14,36 @@ defmodule BlastWeb.GameLive do
     # transforms and rendering styles. This will drastically reduce the size of the
     # rendered SVG DOM.
     ~L"""
-    <svg id="arena" class="arena" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"
-      phx-keydown="player_keydown"
-      phx-keyup="player_keyup"
-      phx-target="window"
-     >
-      <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
-      <%= for game_object <- GameState.game_objects(@game_state) do %>
-        <%= GameObjectRenderer.render_object(game_object) %>
-      <% end %>
-      <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
-    </svg>
-    <div style="display: hidden;" id="sound-fx">
-      <%= for sound <- @game_state.sounds do %>
-        <%= SoundEffectRenderer.render(sound) %>
-      <% end %>
+    <div class="active-game">
+      <div class="stats">
+        <ul>
+          <%= for fighter <- GameState.fighters_in_order(@game_state) do %>
+            <li>
+              <h2 style="color: <%= fighter.colour %>;">Player #<%= fighter.id %></h2>
+              <ul class="player-stats">
+                <li>Score: <%= fighter.score %></li>
+                <li>Integrity: <%= fighter.integrity %></li>
+              </ul>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <svg id="arena" class="arena" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"
+        phx-keydown="player_keydown"
+        phx-keyup="player_keyup"
+        phx-target="window"
+      >
+        <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
+        <%= for game_object <- GameState.game_objects(@game_state) do %>
+          <%= GameObjectRenderer.render_object(game_object) %>
+        <% end %>
+        <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>
+      </svg>
+      <div style="display: hidden;" id="sound-fx">
+        <%= for sound <- @game_state.sounds do %>
+          <%= SoundEffectRenderer.render(sound) %>
+        <% end %>
+      </div>
     </div>
     """
   end

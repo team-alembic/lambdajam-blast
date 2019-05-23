@@ -6,6 +6,8 @@ html {
   height: 100%;
   margin: 0;
   padding: 0;
+  background: linear-gradient(to bottom, #1e5799 0%, #2989d8 50%, #7db9e8 100%)
+    fixed;
 }
 
 body {
@@ -65,4 +67,18 @@ body {
   left: 0;
   height: 100vh;
   width: auto;
+}
+
+.active-game .stats {
+  margin-top: 2em;
+  margin-left: 0.5em;
+  font: 3em "Impact", sans-serif;
+}
+
+.active-game .player-stats {
+  margin-left: 0;
+}
+
+.active-game .stats ul {
+  list-style-type: none;
 }
