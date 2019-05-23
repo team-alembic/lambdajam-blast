@@ -5,7 +5,7 @@
   </script>
   <div class="dashboard">
     <div>
-      <a class="button copy-link" data-clipboard-text="<%= "#{Plug.Conn.get_req_header(@conn, "Host")}#{Routes.game_path(@conn, :join, @game_id)}" %>">Copy link 📋</a>
+      <a class="button copy-link" data-clipboard-text="<%= "#{BlastWeb.Endpoint.url}#{Routes.game_path(@conn, :join, @game_id)}" %>">Copy link 📋</a>
       <a class="button" href="<%= Routes.game_path(@conn, :join_game, @game_id) %>">Join Game 🎮</a>
     </div>
     <p>
