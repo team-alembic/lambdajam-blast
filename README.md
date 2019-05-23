@@ -3,7 +3,8 @@
 To start your Phoenix server:
 
 - Install dependencies with `mix deps.get`
-- Install Node.js dependencies with `cd assets && npm install`
+- Install `yarn` if you don't already have it `npm install -g yarn`
+- Install dependencies with `yarn install --cwd assets`
 - Start Phoenix endpoint with `mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
@@ -30,81 +31,24 @@ Fire weapon: spacebar
 
 ## Scoring
 
-Basic scoring is implemented but not displayed anywhere.
-
-- +5 points for every hit
-- -5 points every time you are hit
+- +10 points for every hit you make on another plater
 
 ## Spawning
 
-At the start of the game, players are spawned as far away from the other players as possible (evenly spread out). Newly spawned players will oriented as per that player's initial orientation and position.
+There game supports a maximum of four players.
+
+Each player has a unique spawn point. The spawn points are the corners of the arena.
 
 ## Ending the game
 
-## Ideas for the workshop
+The game does not end - it keeps going forever.
 
-### Basic: Game link sharing
-
-Currently it shares a relative link, e.g. `/game/FCD2`. For easy sharing it should
-include the full host name (not localhost!).
-
-Perhaps set the hostname as an env var before running the server?
-
-### Basic: Scoring
-
-Display live scores during the game.
-
-To achieve this we need a place to put the scores. `lib/blast_web/live/game_live.ex` is where the rendering
-takes place. It renders an SVG of the game arena and all fighters and projectiles.
-
-Either render the scores inside the SVG using some markup like this for example:
-
-```
-<svg height="90" width="200">
-  <text x="10" y="20" style="fill:red;">Several lines:
-    <tspan x="10" y="45">First line.</tspan>
-    <tspan x="10" y="70">Second line.</tspan>
-  </text>
-</svg>
-```
-
-Or render the scores in one of the gutters to the left or right of the arena.
-
-#### The score data
-
-The scores can be obtained from the GameState `lib/blast/game_state.ex`.
-
-The score for each fighter is in `GameState.fighters[fighter_id].score`.
-
-Scores should be sorted highest to lowest and displayed like this:
-
-- Player 2: 530
-- Player 1: 375
-- Player 3: 210
-- Player 4: 175
-
-Where each player number comes from the `id` of the Fighter struct.
+## Improvement ideas!
 
 ### Basic: Prevent ammo from running out
 
 Find where the book keeping is done that keeps track of the ammo of the Fighter
 and change the code so that it never runs out.
-
-### Intermediate: lower the fire repeat rate
-
-The guns will fire for every animation frame in which the `FighterControls.guns` are set to `:firing`.
-
-This makes the game less fun IMHO.
-
-The FighterControls module is where user input is translate to an effect in the game.
-
-`FighterControls.fire_guns/2` is where the action happens. In order to perform rate limiting
-there will need to be a way to know when a projectile was last fired by a fighter and there
-will need to be an additional argument passed into `fire_guns` representing the current time.
-
-I suggest that time be represented as a frame count, and when the fighter last fired could be
-represented as the number of the frame when the guns were last fired. Store this on the Fighter
-module.
 
 ### Basic: Flash the fighter white when it is hit
 
@@ -129,17 +73,6 @@ that apply for every server frame.
 
 I suggest adding a `check_game_over/1` function that sets a `game_over` flag on the GameState when the end
 game condition is satisfied, then update the rendering in `GameLive` to announce the winner.
-
-### Intermediate: Add sound effects using the HTML5 audio element
-
-Pre-canned sound effects are in the repo in `assets/static/sfx` and are served from `$HOST/sfx/file.wav`.
-
-Details here:
-
-https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
-
-The audio tags could be rendered by GameLive before or after the svg element. You'll need have some
-book-keeping state to know when to clean up tags that have finished playing.
 
 ### Intermediate: Animate some thruster exhaust
 
@@ -167,16 +100,6 @@ Add a field to Fighter (big_guns :on/:off)
 That Fighter's guns either get a higher firing rate or do more damage on a hit.
 
 Simpler option: every 20 seconds of play, pick a random fighter that gets bigger guns as a power up.
-
-### Intermediate: Rate limit firing of guns
-
-Currently a projectile fires for every animation frame that the when fighter controls 'guns' setting is set to firing.
-
-We should prevent the weapons firing for say more frequently than every 10th of a second.
-
-This would require some book keeping to record on the Fighter the last time that the guns were actually fired.
-
-The GameState should track the number of animated frames and pass that through to the FighterControls gun firing logic.
 
 ### Intermediate to Advanced: Add some solid, deflecting features to the arena
 
@@ -217,6 +140,8 @@ The basic vector maths is there but you'd need to calculate a force vector betwe
 missile and the nearest fighter using something like the inverse-square law to calculate
 the strength of the force vector attracting the homing missile to its target.
 
-### Advanced: zoom the viewport to fit the combined bounding box of all players
+### Advanced: zoom and pan the viewport to fit the combined bounding box of all players
 
 This would be a really cool effect that zooms in and out of the action during gameplay.
+
+SVG supports this via the `viewBox` attribute.
