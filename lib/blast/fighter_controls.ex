@@ -105,26 +105,26 @@ defmodule Blast.FighterControls do
   defp fire_guns({fighter, projectiles}, %FighterControls{guns: :not_firing}, _),
     do: {fighter, projectiles}
 
-  # Create a new projectile and deplete the figher's energy weapon charge.
+  # Create a new projectile and deplete the figher's energy weapon ammo.
   defp fire_guns(
-         {fighter = %Fighter{charge_remaining: charge, gun_last_fired_frame: gun_last_fired_frame},
+         {fighter = %Fighter{ammo_remaining: ammo, gun_last_fired_frame: gun_last_fired_frame},
           projectiles},
          %FighterControls{
            guns: :firing
          },
          frame_number
        )
-       when charge > 0 and gun_last_fired_frame <= frame_number - 8 do
+       when ammo > 0 and gun_last_fired_frame <= frame_number - 8 do
     {
       %Fighter{
         fighter
-        | charge_remaining: charge - 1,
+        | ammo_remaining: ammo - 1,
           gun_last_fired_frame: frame_number
       },
       [Projectile.fired_by(fighter) | projectiles]
     }
   end
 
-  # The fighter's weapon charge has been depleted so we can't fire the guns.
+  # The fighter's weapon ammo has been depleted so we can't fire the guns.
   defp fire_guns({fighter, projectiles}, _, _), do: {fighter, projectiles}
 end

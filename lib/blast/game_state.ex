@@ -203,41 +203,49 @@ defmodule Blast.GameState do
         Map.merge(game_state.fighters, %{
           fighter1.id =>
             Fighter.update(fighter1, %{
-              integrity: fighter1.integrity - 5,
+              shields: fighter1.shields - 5,
               object: obj1_updated
             }),
           fighter2.id =>
             Fighter.update(fighter2, %{
-              integrity: fighter2.integrity - 5,
+              shields: fighter2.shields - 5,
               object: obj2_updated
             })
         })
     })
   end
 
-  defp collide({projectile = %Projectile{}, fighter = %Fighter{}}, game_state) do
-    {_, updated_fighter_obj} = PhysicsObject.elastic_collision(projectile.object, fighter.object)
+  defp collide({projectile = %Projectile{}, hit_fighter = %Fighter{}}, game_state) do
+    {_, updated_fighter_obj} =
+      PhysicsObject.elastic_collision(projectile.object, hit_fighter.object)
 
     firing_fighter = Map.get(game_state.fighters, projectile.fired_by_fighter_id)
 
-    update(game_state, %{
-      fighters:
+    fighter_updates =
+      if hit_fighter == firing_fighter do
         Map.merge(game_state.fighters, %{
-          fighter.id =>
-            Fighter.update(fighter, %{
-              integrity: fighter.integrity - 1,
+          hit_fighter.id =>
+            Fighter.update(hit_fighter, %{
+              shields: hit_fighter.shields - 1,
+              object: updated_fighter_obj
+            })
+        })
+      else
+        Map.merge(game_state.fighters, %{
+          hit_fighter.id =>
+            Fighter.update(hit_fighter, %{
+              shields: hit_fighter.shields - 1,
               object: updated_fighter_obj
             }),
           firing_fighter.id =>
             Fighter.update(firing_fighter, %{
-              score:
-                if firing_fighter.id != fighter.id do
-                  firing_fighter.score + 10
-                else
-                  firing_fighter.score
-                end
+              score: firing_fighter.score + 10
             })
-        }),
+        })
+      end
+
+    update(game_state, %{
+      fighters: Map.merge(game_state.fighters, fighter_updates),
       projectiles: List.delete(game_state.projectiles, projectile),
       sounds: [SoundEffect.new(:hit, game_state.frame_number) | game_state.sounds]
     })
@@ -292,7 +300,7 @@ defmodule Blast.GameState do
     dead_fighters =
       fighters
       |> Map.values()
-      |> Enum.filter(&(!&1.dead && &1.integrity <= 0))
+      |> Enum.filter(&(!&1.dead && &1.shields <= 0))
       |> Enum.map(
         &Fighter.update(&1, %{dead: true, respawn_at_frame: game_state.frame_number + 120})
       )
@@ -321,8 +329,8 @@ defmodule Blast.GameState do
         &Fighter.update(&1, %{
           dead: false,
           respawn_at_frame: 0,
-          integrity: 100,
-          charge_remaining: 1000,
+          shields: 100,
+          ammo_remaining: 1000,
           deaths: &1.deaths + 1,
           object: %PhysicsObject{
             &1.object

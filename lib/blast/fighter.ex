@@ -14,8 +14,8 @@ defmodule Blast.Fighter do
   typedstruct enforce: true do
     field :id, pos_integer()
     field :engine_power, pos_integer(), default: 80
-    field :charge_remaining, pos_integer(), default: 1000
-    field :integrity, integer(), default: 100
+    field :ammo_remaining, pos_integer(), default: 1000
+    field :shields, integer(), default: 100
     field :object, PhysicsObject.t()
     field :colour, String.t(), default: "white"
     field :score, integer(), default: 0

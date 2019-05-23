@@ -23,8 +23,8 @@ defmodule BlastWeb.GameLive do
               <ul class="player-stats">
                 <li>Score: <%= fighter.score %></li>
                 <li>Deaths: <%= fighter.deaths %></li>
-                <li>Integrity: <%= fighter.integrity %></li>
-                <li>Ammo: <%= fighter.charge_remaining %></li>
+                <li>Shields: <%= fighter.shields %></li>
+                <li>Ammo: <%= fighter.ammo_remaining %></li>
               </ul>
             </li>
           <% end %>
