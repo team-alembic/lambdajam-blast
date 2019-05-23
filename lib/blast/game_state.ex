@@ -229,7 +229,12 @@ defmodule Blast.GameState do
             }),
           firing_fighter.id =>
             Fighter.update(firing_fighter, %{
-              score: firing_fighter.score + 10
+              score:
+                if firing_fighter.id != fighter.id do
+                  firing_fighter.score + 10
+                else
+                  firing_fighter.score
+                end
             })
         }),
       projectiles: List.delete(game_state.projectiles, projectile),
