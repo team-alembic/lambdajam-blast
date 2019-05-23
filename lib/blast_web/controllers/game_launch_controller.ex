@@ -12,6 +12,6 @@ defmodule BlastWeb.GameLaunchController do
 
   def create(conn, _params) do
     {:ok, game_id} = GameLaunchServer.new()
-    render(conn, "game.html", game_id: game_id)
+    redirect(conn, to: Routes.game_path(conn, :show, game_id))
   end
 end

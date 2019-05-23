@@ -27,6 +27,8 @@ window.ClipboardJS = ClipboardJS;
 // The following is a hack to play audio.
 // We observe DOM element creation events underneath the element with ID "sound-fx".
 // Those nodes have attributes that describe the audio file to play.
+// I did try rendering <audio> elements from the live view but that made Chrome go janky.
+// No idea why.
 window.initSFX = function() {
   const soundFiles = [
     "/sfx/fighter-die.wav",
