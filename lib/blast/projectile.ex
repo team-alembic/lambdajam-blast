@@ -76,7 +76,7 @@ defmodule Blast.Projectile do
     Vector2D.add([
       firing_direction,
       velocity,
-      Vector2D.multiply_mag(Vector2D.unit(firing_direction), 10),
+      Vector2D.multiply_mag(Vector2D.unit(firing_direction), 20),
       Vector2D.multiply_mag(Vector2D.unit_random(), 0.5)
     ])
   end
