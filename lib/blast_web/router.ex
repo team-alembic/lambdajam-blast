@@ -29,6 +29,10 @@ defmodule BlastWeb.Router do
 
   scope "/game", BlastWeb do
     pipe_through [:browser, :game]
-    match :get, "/:game_id", GameController, :join_game
+    # match :get, "/:game_id", GameController, :show_join_game
+    # match :post, "/:game_id", GameController, :join_game
+
+    get "/:game_id", GameController, :show
+    post "/:game_id", GameController, :join
   end
 end

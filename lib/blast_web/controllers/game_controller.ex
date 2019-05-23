@@ -14,13 +14,20 @@ defmodule BlastWeb.GameController do
   alias Blast.GameServer
 
   @doc """
+
+  """
+  def show(conn, %{"game_id" => game_id}) do
+    render(conn, "show.html", game_id: game_id)
+  end
+
+  @doc """
   Joins a Fighter identified `player_id` from the session to a Game identified by `game_id`.
 
   This is an idempotent action: if the player is already joined the operation will be a no-op.
 
   Returns 404 if the Game is not found.
   """
-  def join_game(conn, %{"game_id" => game_id}) do
+  def join(conn, %{"game_id" => game_id}) do
     player_id = Conn.get_session(conn, :player_id)
     do_get(conn, Registry.lookup(GameServerRegistry, game_id), game_id, player_id)
   end

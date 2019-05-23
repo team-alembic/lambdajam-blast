@@ -1,0 +1,5 @@
+<div class="page launch-page">
+  <%= form_for @conn, Routes.game_path(@conn, :join, @game_id), fn _ -> %>
+    <%= submit "Join Game 🚀" %>
+  <% end %>
+</div>
