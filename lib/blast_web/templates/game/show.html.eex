@@ -7,7 +7,7 @@
     <div>
       <a class="button copy-link" data-clipboard-text="<%= "#{BlastWeb.Endpoint.url}#{Routes.game_path(@conn, :join, @game_id)}" %>">Copy link 📋</a>
       <%= form_for @conn, Routes.game_path(@conn, :join, @game_id), fn _ -> %>
-        <%= submit "Join Game 🚀" %>
+        <%= submit "Join Game #{@game_id} 🚀" %>
       <% end %>
     </div>
     <p>
