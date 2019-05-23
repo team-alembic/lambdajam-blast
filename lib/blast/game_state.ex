@@ -42,14 +42,13 @@ defmodule Blast.GameState do
     |> Enum.reduce(game_state, fn event, acc ->
       process_event(acc, event)
     end)
-    # |> clear_sounds()
+    |> inc_frame_number()
     |> apply_fighter_controls(frame_millis)
     |> update_positions(:fighters)
     |> update_positions(:projectiles)
     |> apply_collisions()
     |> reap(:projectiles)
-    |> reap(:sounds, frame_millis)
-    |> inc_frame_number()
+    |> reap(:sounds)
   end
 
   # Processes one user-generated event and returns a new GameState.
@@ -250,11 +249,9 @@ defmodule Blast.GameState do
     })
   end
 
-  defp reap(game_state = %GameState{}, :sounds, frame_millis) do
+  defp reap(game_state = %GameState{frame_number: frame_number, sounds: sounds}, :sounds) do
     update(game_state, %{
-      sounds:
-        game_state.sounds
-        |> Enum.filter(&(&1.starting_frame + 5000 / frame_millis >= game_state.frame_number))
+      sounds: sounds |> Enum.reject(&(&1.starting_frame < frame_number))
     })
   end
 
@@ -273,6 +270,4 @@ defmodule Blast.GameState do
   defp update(game_state = %GameState{}, values = %{}) do
     struct(game_state, values)
   end
-
-  defp clear_sounds(game_state), do: %GameState{game_state | sounds: []}
 end

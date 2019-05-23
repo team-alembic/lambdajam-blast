@@ -50,7 +50,6 @@ window.initSFX = function() {
     soundFiles.map(name => fetch(name).then(response => decode(name, response)))
   )
     .then(fetched => {
-      console.log({ fetched });
       return fetched.reduce(
         (acc, { name, buffer }) => ({ ...acc, [name]: buffer }),
         {}
