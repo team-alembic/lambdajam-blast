@@ -72,13 +72,19 @@ body {
 .active-game .stats {
   margin-top: 2em;
   margin-left: 0.5em;
-  font: 3em "Impact", sans-serif;
+  font: 1em "Impact", sans-serif;
+}
+
+.active-game .controls {
+  font: 1em "Impact", sans-serif;
+  margin-left: 0.5em;
 }
 
 .active-game .player-stats {
   margin-left: 0;
 }
 
-.active-game .stats ul {
+.active-game ul {
+  margin-top: 2em;
   list-style-type: none;
 }

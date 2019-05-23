@@ -145,3 +145,7 @@ the strength of the force vector attracting the homing missile to its target.
 This would be a really cool effect that zooms in and out of the action during gameplay.
 
 SVG supports this via the `viewBox` attribute.
+
+### Advanced: destroy player after closing browser tab
+
+### Advanced: Timebox games and/or destroy abandoned GameServer processes

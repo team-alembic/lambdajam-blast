@@ -30,6 +30,12 @@ defmodule BlastWeb.GameLive do
           <% end %>
         </ul>
       </div>
+      <ul class="controls">
+        <li>⬆️ = fire thrusters</li>
+        <li>⬅️ = rotate left</li>
+        <li>➡️ = rotate right</li>
+        </li>SPACE = fire gun</li>
+      </ul>
       <svg id="arena" class="arena" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"
         phx-keydown="player_keydown"
         phx-keyup="player_keyup"
