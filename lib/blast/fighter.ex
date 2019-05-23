@@ -22,6 +22,7 @@ defmodule Blast.Fighter do
     field :deaths, integer(), default: 0
     field :dead, boolean(), default: false
     field :respawn_at_frame, pos_integer(), default: 0
+    field :gun_last_fired_frame, integer(), default: 0
   end
 
   alias Blast.Polygon

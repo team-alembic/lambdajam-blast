@@ -49,11 +49,11 @@ defmodule Blast.FighterControls do
 
   Returns a tuple of updated state of the form {Fighter.t(), list(Projectile.t())}
   """
-  def apply(controls, fighter_and_projectiles = {%Fighter{}, []}, time_delta) do
+  def apply(controls, fighter_and_projectiles = {%Fighter{}, []}, time_delta, frame_number) do
     fighter_and_projectiles
     |> apply_turn(controls, time_delta)
     |> apply_thrust(controls, time_delta)
-    |> fire_guns(controls)
+    |> fire_guns(controls, frame_number)
   end
 
   # Makes the PhysicsObject actually perform the turn.
@@ -99,26 +99,32 @@ defmodule Blast.FighterControls do
 
   # Spawns projectiles when guns are fired.
   # `current_state` is of the form `{fighter, object, projectiles}`
-  defp fire_guns(current_state, controls)
+  defp fire_guns(current_state, controls, frame_number)
 
   # Nothing to do when the guns aren't firing.
-  defp fire_guns({fighter, projectiles}, %FighterControls{guns: :not_firing}),
+  defp fire_guns({fighter, projectiles}, %FighterControls{guns: :not_firing}, _),
     do: {fighter, projectiles}
 
   # Create a new projectile and deplete the figher's energy weapon charge.
-  defp fire_guns({fighter = %Fighter{charge_remaining: charge}, projectiles}, %FighterControls{
-         guns: :firing
-       })
-       when charge > 0 do
+  defp fire_guns(
+         {fighter = %Fighter{charge_remaining: charge, gun_last_fired_frame: gun_last_fired_frame},
+          projectiles},
+         %FighterControls{
+           guns: :firing
+         },
+         frame_number
+       )
+       when charge > 0 and gun_last_fired_frame <= frame_number - 8 do
     {
       %Fighter{
         fighter
-        | charge_remaining: charge - 1
+        | charge_remaining: charge - 1,
+          gun_last_fired_frame: frame_number
       },
       [Projectile.fired_by(fighter) | projectiles]
     }
   end
 
   # The fighter's weapon charge has been depleted so we can't fire the guns.
-  defp fire_guns({fighter, projectiles}, _), do: {fighter, projectiles}
+  defp fire_guns({fighter, projectiles}, _, _), do: {fighter, projectiles}
 end

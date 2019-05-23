@@ -137,7 +137,8 @@ defmodule Blast.GameState do
         FighterControls.apply(
           controls,
           {Map.get(game_state.fighters, controls.fighter_id), []},
-          frame_millis
+          frame_millis,
+          game_state.frame_number
         )
 
       new_sounds =
