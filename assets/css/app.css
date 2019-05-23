@@ -15,6 +15,10 @@ body {
   padding: 0;
 }
 
+.container {
+  max-width: none;
+}
+
 .launch-page {
   height: 100%;
   width: 100%;
