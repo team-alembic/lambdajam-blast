@@ -224,9 +224,8 @@ defmodule Blast.GameState do
         Map.merge(game_state.fighters, %{
           fighter.id =>
             Fighter.update(fighter, %{
-              integrity: fighter.integrity - 10,
-              object: updated_fighter_obj,
-              score: fighter.score - 10
+              integrity: fighter.integrity - 1,
+              object: updated_fighter_obj
             }),
           firing_fighter.id =>
             Fighter.update(firing_fighter, %{
