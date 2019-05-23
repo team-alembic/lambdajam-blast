@@ -32,9 +32,10 @@ window.ClipboardJS = ClipboardJS;
 window.initSFX = function() {
   const soundFiles = [
     "/sfx/fighter-die.wav",
-    "/sfx/fighter-powerup.wav",
+    "/sfx/fighter-spawn.wav",
     "/sfx/fighter-shields-up-loop.wav",
-    "/sfx/fighter-shoot.wav"
+    "/sfx/fighter-shoot.wav",
+    "/sfx/fighter-hit.wav"
   ];
 
   const context = new AudioContext();

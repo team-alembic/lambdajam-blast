@@ -39,14 +39,15 @@ defmodule Blast.GameState do
   def process_events(game_state = %GameState{}, frame_millis, event_buffer) do
     event_buffer
     |> Enum.uniq()
-    |> Enum.reduce(game_state, fn event, acc ->
+    |> Enum.reduce(inc_frame_number(game_state), fn event, acc ->
       process_event(acc, event)
     end)
-    |> inc_frame_number()
     |> apply_fighter_controls(frame_millis)
     |> update_positions(:fighters)
     |> update_positions(:projectiles)
     |> apply_collisions()
+    |> destroy_dead_fighters()
+    |> respawn_dead_fighters()
     |> reap(:projectiles)
     |> reap(:sounds)
   end
@@ -142,8 +143,8 @@ defmodule Blast.GameState do
       new_sounds =
         projectiles
         |> Enum.with_index()
-        |> Enum.map(fn {_, index} ->
-          SoundEffect.new(:shoot, game_state.next_sound_id + index, game_state.frame_number)
+        |> Enum.map(fn _ ->
+          SoundEffect.new(:shoot, game_state.frame_number)
         end)
 
       update(acc, %{
@@ -188,7 +189,7 @@ defmodule Blast.GameState do
   end
 
   defp apply_collisions(game_state) do
-    Collision.detect(Map.values(game_state.fighters), game_state.projectiles)
+    Collision.detect(alive_fighters(game_state), game_state.projectiles)
     |> Enum.reduce(game_state, &collide/2)
   end
 
@@ -232,7 +233,8 @@ defmodule Blast.GameState do
               score: firing_fighter.score + 10
             })
         }),
-      projectiles: List.delete(game_state.projectiles, projectile)
+      projectiles: List.delete(game_state.projectiles, projectile),
+      sounds: [SoundEffect.new(:hit, game_state.frame_number) | game_state.sounds]
     })
   end
 
@@ -263,15 +265,81 @@ defmodule Blast.GameState do
     length(game_state.projectiles)
   end
 
-  def game_objects(%GameState{fighters: fighters, projectiles: projectiles}) do
-    List.flatten([Map.values(fighters) | projectiles])
+  def active_game_objects(game_state = %GameState{projectiles: projectiles}) do
+    List.flatten([alive_fighters(game_state) | projectiles])
   end
 
   defp update(game_state = %GameState{}, values = %{}) do
     struct(game_state, values)
   end
 
-  def fighters_in_order(game_state = %GameState{fighters: fighters}) do
+  def fighters_in_order(%GameState{fighters: fighters}) do
     fighters |> Map.values() |> Enum.sort_by(& &1.id)
+  end
+
+  defp alive_fighters(%GameState{fighters: fighters}) do
+    fighters
+    |> Map.values()
+    |> Enum.filter(&(!&1.dead))
+  end
+
+  defp destroy_dead_fighters(game_state = %GameState{fighters: fighters, sounds: sounds}) do
+    dead_fighters =
+      fighters
+      |> Map.values()
+      |> Enum.filter(&(!&1.dead && &1.integrity <= 0))
+      |> Enum.map(
+        &Fighter.update(&1, %{dead: true, respawn_at_frame: game_state.frame_number + 120})
+      )
+      |> Enum.map(&{&1.id, &1})
+      |> Enum.into(%{})
+
+    new_sounds =
+      if map_size(dead_fighters) > 0 do
+        [SoundEffect.new(:die, game_state.frame_number)]
+      else
+        []
+      end
+
+    update(game_state, %{
+      fighters: Map.merge(fighters, dead_fighters),
+      sounds: new_sounds ++ sounds
+    })
+  end
+
+  defp respawn_dead_fighters(game_state = %GameState{fighters: fighters, sounds: sounds}) do
+    respawn_fighters =
+      fighters
+      |> Map.values()
+      |> Enum.filter(&(&1.dead && &1.respawn_at_frame == game_state.frame_number))
+      |> Enum.map(
+        &Fighter.update(&1, %{
+          dead: false,
+          respawn_at_frame: 0,
+          integrity: 100,
+          charge_remaining: 1000,
+          deaths: &1.deaths + 1,
+          object: %PhysicsObject{
+            &1.object
+            | position: initial_position(&1.id),
+              orientation: initial_orientation(&1.id),
+              velocity: Vector2D.new(0, 0)
+          }
+        })
+      )
+      |> Enum.map(&{&1.id, &1})
+      |> Enum.into(%{})
+
+    new_sounds =
+      if map_size(respawn_fighters) > 0 do
+        [SoundEffect.new(:spawn, game_state.frame_number)]
+      else
+        []
+      end
+
+    update(game_state, %{
+      fighters: Map.merge(fighters, respawn_fighters),
+      sounds: new_sounds ++ sounds
+    })
   end
 end

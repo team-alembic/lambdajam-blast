@@ -7,7 +7,7 @@ defmodule Blast.SoundEffectRenderer do
   @spec render(Blast.SoundEffect.t()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns = %SoundEffect{}) do
     ~L"""
-    <span id="<%= @id %>" data-src="<%= @file %>">
+    <span data-src="<%= @file %>">
     """
   end
 end

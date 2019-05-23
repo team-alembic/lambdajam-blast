@@ -22,7 +22,9 @@ defmodule BlastWeb.GameLive do
               <h2 style="color: <%= fighter.colour %>;">Player #<%= fighter.id %></h2>
               <ul class="player-stats">
                 <li>Score: <%= fighter.score %></li>
+                <li>Deaths: <%= fighter.deaths %></li>
                 <li>Integrity: <%= fighter.integrity %></li>
+                <li>Ammo: <%= fighter.charge_remaining %></li>
               </ul>
             </li>
           <% end %>
@@ -34,7 +36,7 @@ defmodule BlastWeb.GameLive do
         phx-target="window"
       >
         <rect x="0" y="0" width="1000" height="1000" fill="#000"/>
-        <%= for game_object <- GameState.game_objects(@game_state) do %>
+        <%= for game_object <- GameState.active_game_objects(@game_state) do %>
           <%= GameObjectRenderer.render_object(game_object) %>
         <% end %>
         <rect x="0" y="0" width="1000" height="1000" fill-opacity="0" stroke="#F00" stroke-width="10"/>

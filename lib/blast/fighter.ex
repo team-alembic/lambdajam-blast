@@ -15,10 +15,13 @@ defmodule Blast.Fighter do
     field :id, pos_integer()
     field :engine_power, pos_integer(), default: 80
     field :charge_remaining, pos_integer(), default: 1000
-    field :integrity, float(), default: 100.0
+    field :integrity, integer(), default: 100
     field :object, PhysicsObject.t()
     field :colour, String.t(), default: "white"
     field :score, integer(), default: 0
+    field :deaths, integer(), default: 0
+    field :dead, boolean(), default: false
+    field :respawn_at_frame, pos_integer(), default: 0
   end
 
   alias Blast.Polygon
